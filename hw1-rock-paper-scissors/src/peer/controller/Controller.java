@@ -6,23 +6,15 @@ import java.util.concurrent.CompletableFuture;
 
 public class Controller {
 
-    public void fetchPeerList() {
-        CompletableFuture.supplyAsync(() -> {
+    public void joinNetwork() {
+        CompletableFuture.runAsync(() -> {
             try {
                 // Fetch list of peers from startup server
                 // 1) Create StartupServerConnection
                 // 2) Connect to startup server
                 // 3) Fetch list of peers
                 // 4) Return list of peers
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        });
-    }
 
-    public void joinNetwork() {
-        CompletableFuture.runAsync(() -> {
-            try {
                 // Foreach peer in list send join message
                 // 1) Create new PeerClient
                 // 2) Connect to peer
@@ -49,6 +41,8 @@ public class Controller {
     public void leaveNetwork() {
         CompletableFuture.runAsync(() -> {
             try {
+                // Send leave message to startup server
+
                 // Foreach peer in list send leave message
                 // 1) Create new PeerClient
                 // 2) Connect to peer
