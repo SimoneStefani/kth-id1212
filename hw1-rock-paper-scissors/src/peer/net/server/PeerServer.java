@@ -1,18 +1,20 @@
 package peer.net.server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import peer.controller.Controller;
+import protocol.UtilityMessage;
+
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class PeerServer implements Runnable {
     private ServerSocket serverSocket;
+    private ControllerObserver controllerObserver;
 
-    public void start(ServerSocket serverSocket) {
+    public void start(ServerSocket serverSocket, ControllerObserver controllerObserver) {
         System.out.println("Starting peer server...");
         this.serverSocket = serverSocket;
+        this.controllerObserver = controllerObserver;
         new Thread(this).start();
     }
 
@@ -21,7 +23,7 @@ public class PeerServer implements Runnable {
         System.out.println("Running peer server...");
         try {
             System.out.println("new peer socket: " + serverSocket);
-            while (true) new PeerClientHandler(serverSocket.accept()).run();
+            while (true) new PeerClientHandler(serverSocket.accept(), controllerObserver).run();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -36,33 +38,31 @@ public class PeerServer implements Runnable {
 //    }
 
     private static class PeerClientHandler extends Thread {
+        private final ControllerObserver controllerObserver;
         private Socket clientSocket;
-        private PrintWriter out;
-        private BufferedReader in;
+        private ObjectOutputStream out;
+        private ObjectInputStream in;
 
-        public PeerClientHandler(Socket socket) {
+        public PeerClientHandler(Socket socket, ControllerObserver controllerObserver) {
             this.clientSocket = socket;
+            this.controllerObserver = controllerObserver;
         }
 
         public void run() {
             try {
-                out = new PrintWriter(clientSocket.getOutputStream(), true);
-                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                out = new ObjectOutputStream(clientSocket.getOutputStream());
+                in = new ObjectInputStream(clientSocket.getInputStream());
 
-                String inputLine;
-
-                while ((inputLine = in.readLine()) != null) {
-                    if (".".equals(inputLine)) {
-                        out.println("bye");
-                        break;
-                    }
-                    out.println(inputLine);
+                UtilityMessage message = (UtilityMessage) in.readObject();
+                // If message JOIN, add to list and return list
+                if (message.getMessage().equals("JOIN")) {
+                    System.out.println("Joining request: " + message.getSenderPeerInfo().getPort());
+                    controllerObserver.addPeer(message.getSenderPeerInfo());
+                } else if (message.getMessage().equals("LEAVE")) {
+                    System.out.println("Leave request: " + message.getSenderPeerInfo().getPort());
+                    controllerObserver.removePeer(message.getSenderPeerInfo());
                 }
-
-                in.close();
-                out.close();
-                clientSocket.close();
-            } catch (IOException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }

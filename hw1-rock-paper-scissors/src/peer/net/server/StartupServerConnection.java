@@ -30,6 +30,10 @@ public class StartupServerConnection {
         return peersTable;
     }
 
+    public void sendLeaveMessage(PeerInfo currentPeerInfo) throws IOException, ClassNotFoundException {
+        out.writeObject(new UtilityMessage("LEAVE", currentPeerInfo));
+    }
+
     public void stopConnection() throws IOException {
         in.close();
         out.close();

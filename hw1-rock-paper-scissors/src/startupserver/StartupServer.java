@@ -33,6 +33,10 @@ public class StartupServer {
         return peersTable;
     }
 
+    public void removePeerFromTable(String id) {
+        this.peersTable.remove(id);
+    }
+
     private static class StartupPeerHandler extends Thread {
         private Socket clientSocket;
         private ObjectOutputStream out;
@@ -53,15 +57,17 @@ public class StartupServer {
                 UtilityMessage message = (UtilityMessage) in.readObject();
                 System.out.println("New startup message: " + message.getMessage());
                 // If message JOIN, add to list and return list
+                // If message LEAVE, remove from list
                 if (message.getMessage().equals("JOIN")) {
                     System.out.println("JOIN: " + message.getSenderPeerInfo());
                     HashMap<String, PeerInfo> peersTable = server.addPeerToTable(
                             message.getSenderPeerInfo().getId(),
                             message.getSenderPeerInfo());
                     out.writeObject(new PeersListMessage(peersTable));
+                } else if (message.getMessage().equals("LEAVE")) {
+                    System.out.println("LEAVE: " + message.getSenderPeerInfo());
+                    server.removePeerFromTable(message.getSenderPeerInfo().getId());
                 }
-
-                // If message LEAVE, remove from list
 
                 in.close();
                 out.close();
