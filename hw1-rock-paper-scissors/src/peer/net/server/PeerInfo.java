@@ -1,6 +1,8 @@
 package peer.net.server;
 
-public class PeerInfo {
+import java.io.Serializable;
+
+public class PeerInfo implements Serializable {
     private String id;
     private String host;
     private int port;

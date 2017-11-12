@@ -7,17 +7,33 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class PeerServer {
+public class PeerServer implements Runnable {
     private ServerSocket serverSocket;
 
-    public void start(int port) throws IOException {
-        serverSocket = new ServerSocket(port);
-        while (true) new PeerClientHandler(serverSocket.accept()).run();
+    public void start(ServerSocket serverSocket) {
+        System.out.println("Starting peer server...");
+        this.serverSocket = serverSocket;
+        new Thread(this).start();
     }
 
-    public void stop() throws IOException {
-        serverSocket.close();
+    @Override
+    public void run() {
+        System.out.println("Running peer server...");
+        try {
+            System.out.println("new peer socket: " + serverSocket);
+            while (true) new PeerClientHandler(serverSocket.accept()).run();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+//    public void stop() {
+//        try {
+//            serverSocket.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private static class PeerClientHandler extends Thread {
         private Socket clientSocket;
