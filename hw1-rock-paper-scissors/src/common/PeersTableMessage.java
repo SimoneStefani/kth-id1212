@@ -1,14 +1,14 @@
-package protocol;
+package common;
 
 import peer.net.server.PeerInfo;
 
 import java.io.Serializable;
 import java.util.HashMap;
 
-public class PeersListMessage implements Serializable {
+public class PeersTableMessage implements Serializable {
     HashMap<String, PeerInfo> peersTable;
 
-    public PeersListMessage(HashMap<String, PeerInfo> peersTable) {
+    public PeersTableMessage(HashMap<String, PeerInfo> peersTable) {
         this.peersTable = peersTable;
     }
 

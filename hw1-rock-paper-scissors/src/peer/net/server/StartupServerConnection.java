@@ -1,7 +1,7 @@
 package peer.net.server;
 
-import protocol.PeersListMessage;
-import protocol.UtilityMessage;
+import common.PeersTableMessage;
+import common.UtilityMessage;
 
 
 import java.io.IOException;
@@ -23,7 +23,7 @@ public class StartupServerConnection {
 
     public HashMap<String, PeerInfo> sendJoinMessage(PeerInfo currentPeerInfo) throws IOException, ClassNotFoundException {
         out.writeObject(new UtilityMessage("JOIN", currentPeerInfo));
-        PeersListMessage peersListMessage = (PeersListMessage) in.readObject();
+        PeersTableMessage peersListMessage = (PeersTableMessage) in.readObject();
         HashMap<String, PeerInfo> peersTable = peersListMessage.getPeersTable();
         peersTable.remove(currentPeerInfo.getId());
         stopConnection();

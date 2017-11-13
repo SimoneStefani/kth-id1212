@@ -1,7 +1,6 @@
 package peer.net.server;
 
-import peer.controller.Controller;
-import protocol.UtilityMessage;
+import common.UtilityMessage;
 
 import java.io.*;
 import java.net.ServerSocket;

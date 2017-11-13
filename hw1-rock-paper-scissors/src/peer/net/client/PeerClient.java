@@ -1,7 +1,7 @@
 package peer.net.client;
 
 import peer.net.server.PeerInfo;
-import protocol.UtilityMessage;
+import common.UtilityMessage;
 
 import java.io.*;
 import java.net.Socket;
