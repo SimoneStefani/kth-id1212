@@ -17,12 +17,17 @@ public class PeerClient {
         in = new ObjectInputStream(clientSocket.getInputStream());
     }
 
-    public void sendJoinMessage(PeerInfo currentPeerInfo) throws IOException, ClassNotFoundException {
+    public PeerInfo sendJoinMessage(PeerInfo currentPeerInfo) throws IOException, ClassNotFoundException {
         out.writeObject(new UtilityMessage("JOIN", currentPeerInfo));
+        return (PeerInfo) in.readObject();
     }
 
     public void sendLeaveMessage(PeerInfo currentPeerInfo) throws IOException, ClassNotFoundException {
         out.writeObject(new UtilityMessage("LEAVE", currentPeerInfo));
+    }
+
+    public void sendMoveMessage(String move, PeerInfo currentPeerInfo) throws IOException, ClassNotFoundException {
+        out.writeObject(new UtilityMessage("MOVE", currentPeerInfo, move));
     }
 
     public void stopConnection() throws IOException {

@@ -54,13 +54,17 @@ public class PeerServer implements Runnable {
                 in = new ObjectInputStream(clientSocket.getInputStream());
 
                 UtilityMessage message = (UtilityMessage) in.readObject();
-                // If message JOIN, add to list and return list
+
                 if (message.getMessage().equals("JOIN")) {
                     System.out.println("Joining request: " + message.getSenderPeerInfo().getPort());
                     controllerObserver.addPeer(message.getSenderPeerInfo());
+                    out.writeObject(new UtilityMessage("SYNC", controllerObserver.getPeerInfo()));
                 } else if (message.getMessage().equals("LEAVE")) {
                     System.out.println("Leave request: " + message.getSenderPeerInfo().getPort());
                     controllerObserver.removePeer(message.getSenderPeerInfo());
+                } else if (message.getMessage().equals("MOVE")) {
+                    System.out.println("Move request: " + message.getMove() + " - " + message.getSenderPeerInfo().getPort());
+                    controllerObserver.setPeerMove(message.getMove(), message.getSenderPeerInfo());
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();

@@ -7,10 +7,18 @@ public class PeerInfo implements Serializable {
     private String host;
     private int port;
 
+    private String currentMove;
+    private int roundScore;
+    private int totalScore;
+
     public PeerInfo(String id, String host, int port) {
         this.id = id;
         this.host = host;
         this.port = port;
+
+        this.currentMove = null;
+        this.roundScore = 0;
+        this.totalScore = 0;
     }
 
     public PeerInfo(String host, int port) {
@@ -29,6 +37,18 @@ public class PeerInfo implements Serializable {
         return port;
     }
 
+    public String getCurrentMove() {
+        return currentMove;
+    }
+
+    public int getRoundScore() {
+        return roundScore;
+    }
+
+    public int getTotalScore() {
+        return totalScore;
+    }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -39,6 +59,26 @@ public class PeerInfo implements Serializable {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public void setCurrentMove(String currentMove) {
+        this.currentMove = currentMove;
+    }
+
+    public void setRoundScore(int roundScore) {
+        this.roundScore += roundScore;
+    }
+
+    public void setTotalScore(int totalScore) {
+        this.totalScore += totalScore;
+    }
+
+    public void resetRoundScore() {
+        this.roundScore = 0;
+    }
+
+    public void resetTotalScore() {
+        this.totalScore = 0;
     }
 
     @Override

@@ -7,7 +7,6 @@ import peer.net.server.PeerServer;
 import peer.net.server.StartupServerConnection;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
@@ -31,8 +30,10 @@ public class Controller {
     public static void main(String args[]) throws InterruptedException {
         Controller controller = new Controller();
         controller.joinNetwork();
-        TimeUnit.SECONDS.sleep(5);
-        controller.leaveNetwork();
+        TimeUnit.SECONDS.sleep(10);
+        controller.sendMove("PAPER");
+        //TimeUnit.SECONDS.sleep(10);
+        //controller.leaveNetwork();
     }
 
     public void joinNetwork() {
@@ -58,7 +59,9 @@ public class Controller {
                     // 2) Connect to peer
                     peerClient.startConnection("127.0.0.1", peersTable.get(peer).getPort());
                     // 3) Send join so that peer can add to list
-                    peerClient.sendJoinMessage(currentPeerInfo);
+                    PeerInfo syncedPeerInfo = peerClient.sendJoinMessage(currentPeerInfo);
+                    peersTable.replace(peer, syncedPeerInfo);
+
                 }
             } catch (IOException | ClassNotFoundException e) {
                 System.out.println("Controller error!");
@@ -68,16 +71,23 @@ public class Controller {
     }
 
     public void sendMove(String move) {
+        // Check for already move
+        currentPeerInfo.setCurrentMove(move);
         CompletableFuture.runAsync(() -> {
             try {
                 // Foreach peer in list send move
-                // 1) Create new PeerClient
-                // 2) Connect to peer
-                // 3) Send move
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
+                for (String peer : peersTable.keySet()) {
+                    // 1) Create new PeerClient
+                    PeerClient peerClient = new PeerClient();
+                    // 2) Connect to peer
+                    peerClient.startConnection("127.0.0.1", peersTable.get(peer).getPort());
+                    // 3) Send move
+                    peerClient.sendMoveMessage(move, currentPeerInfo);
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
             }
-        });
+        }).thenRun(this::checkEndGame);
     }
 
     public void leaveNetwork() {
@@ -104,6 +114,77 @@ public class Controller {
         });
     }
 
+    private void checkEndGame() {
+        boolean allScore = true;
+        for (String peer : peersTable.keySet()) {
+            if (peersTable.get(peer).getCurrentMove() == null) allScore = false;
+        }
+        if (allScore && currentPeerInfo.getCurrentMove() != null) {
+            calculateScore(peersTable, currentPeerInfo);
+            printScore(currentPeerInfo);
+            resetPeersMoves(peersTable);
+            resetCurrentPeer(currentPeerInfo);
+        }
+    }
+
+    private void calculateScore(HashMap<String, PeerInfo> peersTable, PeerInfo currentPeerInfo) {
+        for (String idA : peersTable.keySet()) {
+            String moveA = peersTable.get(idA).getCurrentMove();
+
+            for (String idB : peersTable.keySet()) {
+                if (!idA.equals(idB)) {
+                    String moveB = peersTable.get(idB).getCurrentMove();
+
+                    if(moveA.equals("PAPER")) {
+                        peersTable.get(idA).setRoundScore(moveB.equals("ROCK") ? 1 : 0);
+                    }
+                    if(moveA.equals("ROCK")) {
+                        peersTable.get(idA).setRoundScore(moveB.equals("SCISSORS") ? 1 : 0);
+                    }
+                    if(moveA.equals("SCISSORS")) {
+                        peersTable.get(idA).setRoundScore(moveB.equals("PAPER") ? 1 : 0);
+                    }
+                }
+            }
+
+            peersTable.get(idA).setTotalScore(peersTable.get(idA).getRoundScore());
+            peersTable.get(idA).resetRoundScore();
+        }
+
+        String moveA = currentPeerInfo.getCurrentMove();
+
+        for (String idB : peersTable.keySet()) {
+            String moveB = peersTable.get(idB).getCurrentMove();
+
+            if (moveA.equals("PAPER")) {
+                currentPeerInfo.setRoundScore(moveB.equals("ROCK") ? 1 : 0);
+            }
+            if (moveA.equals("ROCK")) {
+                currentPeerInfo.setRoundScore(moveB.equals("SCISSORS") ? 1 : 0);
+            }
+            if (moveA.equals("SCISSORS")) {
+                currentPeerInfo.setRoundScore(moveB.equals("PAPER") ? 1 : 0);
+            }
+        }
+
+        currentPeerInfo.setTotalScore(currentPeerInfo.getRoundScore());
+    }
+
+    private void printScore(PeerInfo peer) {
+        System.out.println("Round score: " + peer.getRoundScore() + " - Total score: " + peer.getTotalScore());
+    }
+
+    private void resetPeersMoves(HashMap<String, PeerInfo> peersTable) {
+        for (String id : peersTable.keySet()) {
+            peersTable.get(id).setCurrentMove(null);
+        }
+    }
+
+    private void resetCurrentPeer(PeerInfo peer) {
+        peer.setCurrentMove(null);
+        peer.resetRoundScore();
+    }
+
     private class ListManipulator implements ControllerObserver {
         @Override
         public void addPeer(PeerInfo peer) {
@@ -115,6 +196,19 @@ public class Controller {
         public void removePeer(PeerInfo peer) {
             System.out.println("Removing peer: " + peer.getPort());
             peersTable.remove(peer.getId());
+        }
+
+        @Override
+        public PeerInfo getPeerInfo() {
+            return currentPeerInfo;
+        }
+
+        @Override
+        public void setPeerMove(String move, PeerInfo peer) {
+            System.out.println("Move " + move + " by " + peer.getPort());
+            peersTable.get(peer.getId()).setCurrentMove(move);
+
+            checkEndGame();
         }
     }
 }
