@@ -15,7 +15,7 @@ public class MessageWrapper implements Serializable {
         this.move = null;
     }
 
-    public MessageWrapper(Message Message, PeerInfo senderPeerInfo, String move) {
+    public MessageWrapper(Message message, PeerInfo senderPeerInfo, String move) {
         this.message = message;
         this.senderPeerInfo = senderPeerInfo;
         this.move = move;
@@ -31,5 +31,14 @@ public class MessageWrapper implements Serializable {
 
     public String getMove() {
         return move;
+    }
+
+    @Override
+    public String toString() {
+        return "MessageWrapper{" +
+                "message=" + message +
+                ", senderPeerInfo=" + senderPeerInfo +
+                ", move='" + move + '\'' +
+                '}';
     }
 }
