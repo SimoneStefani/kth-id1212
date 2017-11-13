@@ -1,6 +1,6 @@
 package peer.net.server;
 
-import common.UtilityMessage;
+import common.MessageWrapper;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -52,12 +52,12 @@ public class PeerServer implements Runnable {
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
                 in = new ObjectInputStream(clientSocket.getInputStream());
 
-                UtilityMessage message = (UtilityMessage) in.readObject();
+                MessageWrapper message = (MessageWrapper) in.readObject();
 
                 if (message.getMessage().equals("JOIN")) {
                     System.out.println("Joining request: " + message.getSenderPeerInfo().getPort());
                     controllerObserver.addPeer(message.getSenderPeerInfo());
-                    out.writeObject(new UtilityMessage("SYNC", controllerObserver.getPeerInfo()));
+                    out.writeObject(new MessageWrapper("SYNC", controllerObserver.getPeerInfo()));
                 } else if (message.getMessage().equals("LEAVE")) {
                     System.out.println("Leave request: " + message.getSenderPeerInfo().getPort());
                     controllerObserver.removePeer(message.getSenderPeerInfo());

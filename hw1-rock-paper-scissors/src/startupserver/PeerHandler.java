@@ -1,8 +1,7 @@
 package startupserver;
 
 import peer.net.server.PeerInfo;
-import common.PeersTableMessage;
-import common.UtilityMessage;
+import common.MessageWrapper;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -31,14 +30,16 @@ public class PeerHandler extends Thread {
             ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
 
             // Read message
-            UtilityMessage message = (UtilityMessage) in.readObject();
+            MessageWrapper message = (MessageWrapper) in.readObject();
 
-            // If JOIN, add peer to table and return table in PeersTableMessage
+            // If JOIN, add peer to table and return table in PeersTableWrapper
             // If LEAVE, remove peer from table
             if (message.getMessage().equals("JOIN")) {
+                LOGGER.info("Peer at " + message.getSenderPeerInfo().getPort() + " is joining the network");
                 HashMap<String, PeerInfo> peersTable = server.peersTable.addPeerToTable(message.getSenderPeerInfo());
-                out.writeObject(new PeersTableMessage(peersTable));
+                out.writeObject(new PeersTableWrapper(peersTable));
             } else if (message.getMessage().equals("LEAVE")) {
+                LOGGER.info("Peer at " + message.getSenderPeerInfo().getPort() + " is leaving the network");
                 server.peersTable.removePeerFromTable(message.getSenderPeerInfo().getId());
             }
 

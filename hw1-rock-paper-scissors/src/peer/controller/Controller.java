@@ -1,13 +1,13 @@
 package peer.controller;
 
-import peer.net.client.PeerClient;
+import peer.net.client.PeerConnection;
+import peer.net.client.StartupServerConnection;
 import peer.net.server.*;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 public class Controller {
     private PeerInfo currentPeerInfo;
@@ -43,12 +43,12 @@ public class Controller {
 
                 // Foreach peer in list send join message
                 for (String peer : peersTable.keySet()) {
-                    // 1) Create new PeerClient
-                    PeerClient peerClient = new PeerClient();
+                    // 1) Create new PeerConnection
+                    PeerConnection peerConnection = new PeerConnection();
                     // 2) Connect to peer
-                    peerClient.startConnection("127.0.0.1", peersTable.get(peer).getPort());
+                    peerConnection.startConnection("127.0.0.1", peersTable.get(peer).getPort());
                     // 3) Send join so that peer can add to list
-                    PeerInfo syncedPeerInfo = peerClient.sendJoinMessage(currentPeerInfo);
+                    PeerInfo syncedPeerInfo = peerConnection.sendJoinMessage(currentPeerInfo);
                     peersTable.replace(peer, syncedPeerInfo);
 
                 }
@@ -66,12 +66,12 @@ public class Controller {
             try {
                 // Foreach peer in list send move
                 for (String peer : peersTable.keySet()) {
-                    // 1) Create new PeerClient
-                    PeerClient peerClient = new PeerClient();
+                    // 1) Create new PeerConnection
+                    PeerConnection peerConnection = new PeerConnection();
                     // 2) Connect to peer
-                    peerClient.startConnection("127.0.0.1", peersTable.get(peer).getPort());
+                    peerConnection.startConnection("127.0.0.1", peersTable.get(peer).getPort());
                     // 3) Send move
-                    peerClient.sendMoveMessage(move, currentPeerInfo);
+                    peerConnection.sendMoveMessage(move, currentPeerInfo);
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
@@ -90,12 +90,12 @@ public class Controller {
 
                 // Foreach peer in list send leave message
                 for (String peer : peersTable.keySet()) {
-                    // 1) Create new PeerClient
-                    PeerClient peerClient = new PeerClient();
+                    // 1) Create new PeerConnection
+                    PeerConnection peerConnection = new PeerConnection();
                     // 2) Connect to peer
-                    peerClient.startConnection("127.0.0.1", peersTable.get(peer).getPort());
+                    peerConnection.startConnection("127.0.0.1", peersTable.get(peer).getPort());
                     // 3) Send leave so that peer can remove from list
-                    peerClient.sendLeaveMessage(currentPeerInfo);
+                    peerConnection.sendLeaveMessage(currentPeerInfo);
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();

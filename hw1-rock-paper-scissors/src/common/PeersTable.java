@@ -2,9 +2,10 @@ package common;
 
 import peer.net.server.PeerInfo;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public class PeersTable {
+public class PeersTable implements Serializable {
     private HashMap<String, PeerInfo> peersTable;
 
     /**

@@ -4,24 +4,24 @@ import peer.net.server.PeerInfo;
 
 import java.io.Serializable;
 
-public class UtilityMessage implements Serializable {
-    private String message;
+public class MessageWrapper implements Serializable {
+    private Message message;
     private PeerInfo senderPeerInfo;
     private String move;
 
-    public UtilityMessage(String message, PeerInfo senderPeerInfo) {
+    public MessageWrapper(Message message, PeerInfo senderPeerInfo) {
         this.message = message;
         this.senderPeerInfo = senderPeerInfo;
         this.move = null;
     }
 
-    public UtilityMessage(String message, PeerInfo senderPeerInfo, String move) {
+    public MessageWrapper(Message Message, PeerInfo senderPeerInfo, String move) {
         this.message = message;
         this.senderPeerInfo = senderPeerInfo;
         this.move = move;
     }
 
-    public String getMessage() {
+    public Message getMessage() {
         return message;
     }
 
