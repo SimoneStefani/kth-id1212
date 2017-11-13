@@ -1,10 +1,7 @@
 package peer.controller;
 
 import peer.net.client.PeerClient;
-import peer.net.server.ControllerObserver;
-import peer.net.server.PeerInfo;
-import peer.net.server.PeerServer;
-import peer.net.server.StartupServerConnection;
+import peer.net.server.*;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -27,14 +24,6 @@ public class Controller {
         }
     }
 
-    public static void main(String args[]) throws InterruptedException {
-        Controller controller = new Controller();
-        controller.joinNetwork();
-        TimeUnit.SECONDS.sleep(10);
-        controller.sendMove("PAPER");
-        //TimeUnit.SECONDS.sleep(10);
-        //controller.leaveNetwork();
-    }
 
     public void joinNetwork() {
         System.out.println("Joining network...");
@@ -70,7 +59,7 @@ public class Controller {
         });
     }
 
-    public void sendMove(String move) {
+    public void sendMove(String move, OutputHandler console) {
         // Check for already move
         currentPeerInfo.setCurrentMove(move);
         CompletableFuture.runAsync(() -> {
@@ -87,7 +76,7 @@ public class Controller {
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        }).thenRun(this::checkEndGame);
+        }).thenRun(() -> console.handleMsg(checkEndGame()));
     }
 
     public void leaveNetwork() {
@@ -114,17 +103,20 @@ public class Controller {
         });
     }
 
-    private void checkEndGame() {
+    private String checkEndGame() {
+        String printout = "";
         boolean allScore = true;
         for (String peer : peersTable.keySet()) {
             if (peersTable.get(peer).getCurrentMove() == null) allScore = false;
         }
         if (allScore && currentPeerInfo.getCurrentMove() != null) {
             calculateScore(peersTable, currentPeerInfo);
-            printScore(currentPeerInfo);
+            printout = printScore(currentPeerInfo);
             resetPeersMoves(peersTable);
             resetCurrentPeer(currentPeerInfo);
         }
+
+        return  printout;
     }
 
     private void calculateScore(HashMap<String, PeerInfo> peersTable, PeerInfo currentPeerInfo) {
@@ -170,8 +162,8 @@ public class Controller {
         currentPeerInfo.setTotalScore(currentPeerInfo.getRoundScore());
     }
 
-    private void printScore(PeerInfo peer) {
-        System.out.println("Round score: " + peer.getRoundScore() + " - Total score: " + peer.getTotalScore());
+    private String printScore(PeerInfo peer) {
+        return "Round score: " + peer.getRoundScore() + " - Total score: " + peer.getTotalScore();
     }
 
     private void resetPeersMoves(HashMap<String, PeerInfo> peersTable) {
