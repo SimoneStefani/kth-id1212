@@ -16,7 +16,7 @@ public class GameShell implements Runnable {
         if (running) return;
         running = true;
 
-        controller = new Controller();
+        controller = new Controller(new ConsoleOutput());
 
         new Thread(this).start();
     }

@@ -3,35 +3,49 @@ package common;
 import peer.net.server.PeerInfo;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class PeersTable implements Serializable {
     private HashMap<String, PeerInfo> peersTable;
 
-    /**
-     * Create a new empty peersTable.
-     */
     public PeersTable() {
         this.peersTable = new HashMap<>();
     }
 
-    /**
-     * Add a new peer to the table.
-     *
-     * @param peerInfo the new peer
-     * @return the updated peersTable
-     */
-    public HashMap<String, PeerInfo> addPeerToTable(PeerInfo peerInfo) {
+    public void addPeerToTable(PeerInfo peerInfo) {
         this.peersTable.put(peerInfo.getId(), peerInfo);
-        return peersTable;
     }
 
-    /**
-     * Remove a peer from the table.
-     *
-     * @param id of the peer to remove
-     */
     public void removePeerFromTable(String id) {
         this.peersTable.remove(id);
+    }
+
+    public Collection<PeerInfo> getPeersInfo() {
+        return this.peersTable.values();
+    }
+
+    public void replacePeer(PeerInfo peerInfo) {
+        this.peersTable.replace(peerInfo.getId(), peerInfo);
+    }
+
+    public void resetPeersMoves() {
+        for (PeerInfo peer : this.peersTable.values()) {
+            peer.setCurrentMove(null);
+        }
+    }
+
+    public boolean allPeersPlayed() {
+        boolean allPlayed = true;
+
+        for (PeerInfo peer : this.peersTable.values()) {
+            if (peer.getCurrentMove() == null) allPlayed = false;
+        }
+
+        return allPlayed;
+    }
+
+    public void setPeerMove(PeerInfo peer, String move) {
+        peersTable.get(peer.getId()).setCurrentMove(move);
     }
 }

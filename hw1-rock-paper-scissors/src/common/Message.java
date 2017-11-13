@@ -15,5 +15,10 @@ public enum Message {
     /**
      * Making a new move
      */
-    MOVE
+    MOVE,
+
+    /**
+     * Synchronise state of peer
+     */
+    SYNC
 }
