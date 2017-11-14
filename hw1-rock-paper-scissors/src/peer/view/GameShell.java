@@ -1,5 +1,6 @@
 package peer.view;
 
+import common.PrettyPrinter;
 import peer.controller.Controller;
 import peer.net.server.OutputHandler;
 
@@ -23,8 +24,12 @@ public class GameShell implements Runnable {
 
     @Override
     public void run() {
+        outMgr.print(PrettyPrinter.buildWelcomeMessage());
+        outMgr.println(PrettyPrinter.buildStartInfoMessage());
+        outMgr.print(PROMPT);
+
         while (running) {
-            CmdLine cmdLine = new CmdLine(readNextLine());
+            CmdLine cmdLine = new CmdLine(console.nextLine());
             switch (cmdLine.getCmd()) {
                 case CONNECT:
                     controller.joinNetwork();
@@ -32,15 +37,14 @@ public class GameShell implements Runnable {
                 case DISCONNECT:
                     controller.leaveNetwork();
                     break;
+                //case MAKE_MOVE:
+                   // controller.sendMove(cmdLine.getUserInput(), new ConsoleOutput());
+                case NO_COMMAND:
+                    outMgr.print(PROMPT);
                 default:
-                    controller.sendMove(cmdLine.getUserInput(), new ConsoleOutput());
+                    outMgr.print("Pew");
             }
         }
-    }
-
-    private String readNextLine() {
-        outMgr.print(PROMPT);
-        return console.nextLine();
     }
 
     private class ConsoleOutput implements OutputHandler {

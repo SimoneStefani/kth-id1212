@@ -29,6 +29,10 @@ public class PeersTable implements Serializable {
         return peersTable;
     }
 
+    public int getTableSize() {
+        return peersTable.size();
+    }
+
     public void replacePeer(PeerInfo peerInfo) {
         this.peersTable.replace(peerInfo.getId(), peerInfo);
     }

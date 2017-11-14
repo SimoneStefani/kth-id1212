@@ -1,6 +1,7 @@
 package peer.controller;
 
 import common.PeersTable;
+import common.PrettyPrinter;
 import peer.net.client.PeerConnection;
 import peer.net.client.StartupServerConnection;
 import peer.net.server.*;
@@ -38,7 +39,8 @@ public class Controller {
             } catch (IOException | ClassNotFoundException e) {
                 LOGGER.log(Level.SEVERE, e.toString(), e);
             }
-        }).thenRun(this::contactJoinAllPeers);
+        }).thenRun(() -> console.handleMsg(PrettyPrinter.buildSuccessfulConnectionMessage(peersTable.getTableSize())))
+                .thenRun(this::contactJoinAllPeers);
     }
 
     private void contactJoinAllPeers() {
