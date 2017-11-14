@@ -20,10 +20,9 @@ public class PrettyPrinter {
                 BOTTOM_BORDER + "\033[0m" + "\n";
     }
 
-//    public static String buildPeerJoinedMessage(int peersNumber) {
-//        return "\033[33m" + "A new player has joined the network." + "\033[0m" +
-//                buildNumberPeersMessage(peersNumber);
-//    }
+    public static String buildCommandErrorMessage(String reason) {
+        return "\033[31m" + "Error: " + reason + "\033[0m" + "\n";
+    }
 //
 //    public static String buildNumberPeersMessage(int peersNumber) {
 //        return "\033[33m" + "There are " + peersNumber + "peers connected!";

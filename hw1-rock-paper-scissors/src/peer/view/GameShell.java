@@ -29,20 +29,23 @@ public class GameShell implements Runnable {
         outMgr.print(PROMPT);
 
         while (running) {
-            CmdLine cmdLine = new CmdLine(console.nextLine());
-            switch (cmdLine.getCmd()) {
-                case CONNECT:
-                    controller.joinNetwork();
-                    break;
-                case DISCONNECT:
-                    controller.leaveNetwork();
-                    break;
-                //case MAKE_MOVE:
-                   // controller.sendMove(cmdLine.getUserInput(), new ConsoleOutput());
-                case NO_COMMAND:
-                    outMgr.print(PROMPT);
-                default:
-                    outMgr.print("Pew");
+            try {
+                LineParser parsedLine = new LineParser(console.nextLine());
+                switch (parsedLine.getCommand()) {
+                    case CONNECT:
+                        controller.joinNetwork();
+                        break;
+                    case DISCONNECT:
+                        controller.leaveNetwork();
+                        break;
+                    case MAKE_MOVE:
+                        controller.sendMove(parsedLine.getArgument(0), new ConsoleOutput());
+                    case NO_COMMAND:
+                        outMgr.print(PROMPT);
+                }
+            } catch (IllegalArgumentException e) {
+                outMgr.print(PrettyPrinter.buildCommandErrorMessage(e.getMessage()));
+                outMgr.print(PROMPT);
             }
         }
     }
@@ -50,7 +53,7 @@ public class GameShell implements Runnable {
     private class ConsoleOutput implements OutputHandler {
         @Override
         public void handleMsg(String msg) {
-            outMgr.println((String) msg);
+            outMgr.println(msg);
             outMgr.print(PROMPT);
         }
     }
