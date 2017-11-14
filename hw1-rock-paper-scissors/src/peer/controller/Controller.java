@@ -35,35 +35,46 @@ public class Controller {
                 startupServerConnection.startConnection("127.0.0.1", 8080);
                 peersTable = startupServerConnection.sendJoinMessage(currentPeerInfo);
                 startupServerConnection.stopConnection();
+            } catch (IOException | ClassNotFoundException e) {
+                LOGGER.log(Level.SEVERE, e.toString(), e);
+            }
+        }).thenRun(this::contactJoinAllPeers);
+    }
 
-                for (PeerInfo peer : peersTable.getPeersInfo()) {
+    private void contactJoinAllPeers() {
+        for (PeerInfo peer : peersTable.getPeersInfo()) {
+            CompletableFuture.runAsync(() -> {
+                try {
                     PeerConnection peerConnection = new PeerConnection();
                     peerConnection.startConnection("127.0.0.1", peer.getPort());
                     PeerInfo syncedPeerInfo = peerConnection.sendJoinMessage(currentPeerInfo);
                     peersTable.replacePeer(syncedPeerInfo);
                     peerConnection.stopConnection();
+                } catch (IOException | ClassNotFoundException e) {
+                    LOGGER.log(Level.SEVERE, e.toString(), e);
                 }
-            } catch (IOException | ClassNotFoundException e) {
-                LOGGER.log(Level.SEVERE, e.toString(), e);
-            }
-        });
+            });
+        }
     }
 
     public void sendMove(String move, OutputHandler console) {
-        // Check for already move
+        if (currentPeerInfo.getCurrentMove() != null) return;
         currentPeerInfo.setCurrentMove(move);
-        CompletableFuture.runAsync(() -> {
-            try {
-                for (PeerInfo peer : peersTable.getPeersInfo()) {
+        String message = GameManager.checkEndGame(peersTable, currentPeerInfo);
+        if (!message.equals("")) console.handleMsg(message);
+
+        for (PeerInfo peer : peersTable.getPeersInfo()) {
+            CompletableFuture.runAsync(() -> {
+                try {
                     PeerConnection peerConnection = new PeerConnection();
                     peerConnection.startConnection("127.0.0.1", peer.getPort());
                     peerConnection.sendMoveMessage(move, currentPeerInfo);
                     peerConnection.stopConnection();
+                } catch (IOException | ClassNotFoundException e) {
+                    LOGGER.log(Level.SEVERE, e.toString(), e);
                 }
-            } catch (IOException | ClassNotFoundException e) {
-                LOGGER.log(Level.SEVERE, e.toString(), e);
-            }
-        }).thenRun(() -> console.handleMsg(GameManager.checkEndGame(peersTable, currentPeerInfo))); // TODO fix
+            });
+        }
     }
 
     public void leaveNetwork() {
@@ -105,7 +116,9 @@ public class Controller {
         @Override
         public void setPeerMove(String move, PeerInfo peer) {
             peersTable.setPeerMove(peer, move);
-            console.handleMsg(GameManager.checkEndGame(peersTable, currentPeerInfo));
+
+            String message = GameManager.checkEndGame(peersTable, currentPeerInfo);
+            if (!message.equals("")) console.handleMsg(message);
         }
     }
 }

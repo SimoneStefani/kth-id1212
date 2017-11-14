@@ -13,6 +13,7 @@ public class GameManager {
             printout = "Round score: " + currentPeerInfo.getRoundScore() + " - Total score: " + currentPeerInfo.getTotalScore();
             peersTable.resetPeersMoves();
             currentPeerInfo.setCurrentMove(null);
+            currentPeerInfo.resetRoundScore();
         }
 
         return  printout;

@@ -37,9 +37,11 @@ public class PeerHandler extends Thread {
                 LOGGER.info("Peer at " + message.getSenderPeerInfo().getPort() + " is joining the network");
                 server.peersTable.addPeerToTable(message.getSenderPeerInfo());
                 out.writeObject(server.peersTable);
+                System.out.println(server.peersTable);
             } else if (message.getMessage().equals(Message.LEAVE)) {
                 LOGGER.info("Peer at " + message.getSenderPeerInfo().getPort() + " is leaving the network");
                 server.peersTable.removePeerFromTable(message.getSenderPeerInfo().getId());
+                System.out.println(server.peersTable);
             }
 
             // Close streams and socket

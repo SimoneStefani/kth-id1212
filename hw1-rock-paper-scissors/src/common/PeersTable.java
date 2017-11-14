@@ -25,6 +25,10 @@ public class PeersTable implements Serializable {
         return this.peersTable.values();
     }
 
+    public HashMap<String, PeerInfo> getPeersTable() {
+        return peersTable;
+    }
+
     public void replacePeer(PeerInfo peerInfo) {
         this.peersTable.replace(peerInfo.getId(), peerInfo);
     }
@@ -47,5 +51,10 @@ public class PeersTable implements Serializable {
 
     public void setPeerMove(PeerInfo peer, String move) {
         peersTable.get(peer.getId()).setCurrentMove(move);
+    }
+
+    @Override
+    public String toString() {
+        return "PeersTable: {" + peersTable + "}";
     }
 }
