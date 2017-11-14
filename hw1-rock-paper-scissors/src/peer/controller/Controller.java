@@ -17,12 +17,14 @@ public class Controller {
     private PeerInfo currentPeerInfo;
     private PeersTable peersTable;
     private OutputHandler console;
+    private String startupServerHost = "127.0.0.1";
+    private int startupServerPort = 8080;
 
     public Controller(OutputHandler console) {
         this.console = console;
         try {
             ServerSocket serverSocket = new ServerSocket(0); // The port will be automatically assigned
-            this.currentPeerInfo = new PeerInfo(serverSocket.getInetAddress().toString(), serverSocket.getLocalPort());
+            this.currentPeerInfo = new PeerInfo(serverSocket.getInetAddress().getHostName(), serverSocket.getLocalPort());
             new PeerServer().start(serverSocket, new PeersTableManipulator());
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.toString(), e);
@@ -30,6 +32,8 @@ public class Controller {
     }
 
     public void joinNetwork(String ip, int port) {
+        this.startupServerHost = ip;
+        this.startupServerPort = port;
         CompletableFuture.runAsync(() -> {
             try {
                 StartupServerConnection startupServerConnection = new StartupServerConnection();
@@ -48,7 +52,7 @@ public class Controller {
             CompletableFuture.runAsync(() -> {
                 try {
                     PeerConnection peerConnection = new PeerConnection();
-                    peerConnection.startConnection("127.0.0.1", peer.getPort());
+                    peerConnection.startConnection(peer.getHost(), peer.getPort());
                     PeerInfo syncedPeerInfo = peerConnection.sendJoinMessage(currentPeerInfo);
                     peersTable.replacePeer(syncedPeerInfo);
                     peerConnection.stopConnection();
@@ -69,7 +73,7 @@ public class Controller {
             CompletableFuture.runAsync(() -> {
                 try {
                     PeerConnection peerConnection = new PeerConnection();
-                    peerConnection.startConnection("127.0.0.1", peer.getPort());
+                    peerConnection.startConnection(peer.getHost(), peer.getPort());
                     peerConnection.sendMoveMessage(move, currentPeerInfo);
                     peerConnection.stopConnection();
                 } catch (IOException | ClassNotFoundException e) {
@@ -83,13 +87,13 @@ public class Controller {
         CompletableFuture.runAsync(() -> {
             try {
                 StartupServerConnection startupServerConnection = new StartupServerConnection();
-                startupServerConnection.startConnection("127.0.0.1", 8080);
+                startupServerConnection.startConnection(startupServerHost, startupServerPort);
                 startupServerConnection.sendLeaveMessage(currentPeerInfo);
                 startupServerConnection.stopConnection();
 
                 for (PeerInfo peer : peersTable.getPeersInfo()) {
                     PeerConnection peerConnection = new PeerConnection();
-                    peerConnection.startConnection("127.0.0.1", peer.getPort());
+                    peerConnection.startConnection(peer.getHost(), peer.getPort());
                     peerConnection.sendLeaveMessage(currentPeerInfo);
                     peerConnection.stopConnection();
                 }
