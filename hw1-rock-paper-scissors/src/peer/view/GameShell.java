@@ -37,11 +37,16 @@ public class GameShell implements Runnable {
                                 parsedLine.getArgument(0),
                                 Integer.parseInt(parsedLine.getArgument(1)));
                         break;
-                    case DISCONNECT:
+                    case QUIT:
                         controller.leaveNetwork();
+                        running = false;
                         break;
                     case MAKE_MOVE:
                         controller.sendMove(parsedLine.getArgument(0), new ConsoleOutput());
+                        break;
+                    case NO_COMMAND:
+                        outMgr.print(PROMPT );
+                        break;
                 }
             } catch (IllegalArgumentException e) {
                 outMgr.print(PrettyPrinter.buildCommandErrorMessage(e.getMessage()));

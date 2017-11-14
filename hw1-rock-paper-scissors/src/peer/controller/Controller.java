@@ -40,8 +40,10 @@ public class Controller {
                 startupServerConnection.startConnection(ip, port);
                 peersTable = startupServerConnection.sendJoinMessage(currentPeerInfo);
                 startupServerConnection.stopConnection();
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (ClassNotFoundException e) {
                 LOGGER.log(Level.SEVERE, e.toString(), e);
+            } catch (IOException e) {
+                console.handleMsg(PrettyPrinter.buildNetworkErrorMessage("Unable to connect to startup server!"));
             }
         }).thenRun(() -> console.handleMsg(PrettyPrinter.buildSuccessfulConnectionMessage(peersTable.getTableSize())))
                 .thenRun(this::contactJoinAllPeers);
@@ -56,7 +58,7 @@ public class Controller {
                     PeerInfo syncedPeerInfo = peerConnection.sendJoinMessage(currentPeerInfo);
                     peersTable.replacePeer(syncedPeerInfo);
                     peerConnection.stopConnection();
-                } catch (IOException | ClassNotFoundException e) {
+                } catch (ClassNotFoundException | IOException e) {
                     LOGGER.log(Level.SEVERE, e.toString(), e);
                 }
             });
@@ -66,6 +68,10 @@ public class Controller {
     public void sendMove(String move, OutputHandler console) {
         if (currentPeerInfo.getCurrentMove() != null) return;
         currentPeerInfo.setCurrentMove(move);
+        if (peersTable.getPeersTable().size() == 0) {
+            console.handleMsg(PrettyPrinter.buildWaitingPeersMessage());
+            return;
+        }
         String message = GameManager.checkEndGame(peersTable, currentPeerInfo);
         if (!message.equals("")) console.handleMsg(PrettyPrinter.buildScoreMessage(message));
 
@@ -112,6 +118,9 @@ public class Controller {
         @Override
         public void removePeer(PeerInfo peer) {
             peersTable.removePeerFromTable(peer.getId());
+
+            String message = GameManager.checkEndGame(peersTable, currentPeerInfo);
+            if (!message.equals("")) console.handleMsg(PrettyPrinter.buildScoreMessage(message));
         }
 
         @Override

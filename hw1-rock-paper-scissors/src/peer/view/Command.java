@@ -2,7 +2,7 @@ package peer.view;
 
 public enum Command {
     CONNECT,
-    DISCONNECT,
+    QUIT,
     MAKE_MOVE,
     NO_COMMAND
 }

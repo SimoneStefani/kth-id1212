@@ -15,7 +15,8 @@ public class StartupServer {
     public static void main(String[] args) {
         LOGGER.info("Starting startup server");
         StartupServer server = new StartupServer();
-        server.start(8080);
+        int portNum = args.length == 1 ? Integer.parseInt(args[0]) : 8080;
+        server.start(portNum);
     }
 
     /**

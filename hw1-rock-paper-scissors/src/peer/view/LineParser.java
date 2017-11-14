@@ -2,8 +2,11 @@ package peer.view;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 public class LineParser {
+    private final String IP_REGEX = "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])";
+    private final String PORT_REGEX = "(6553[0-5]|655[0-2][0-9]\\d|65[0-4](\\d){2}|6[0-4](\\d){3}|[1-5](\\d){4}|[1-9](\\d){0,3})";
     private ArrayList<String> arguments = new ArrayList<>();
     private Command command;
 
@@ -23,11 +26,19 @@ public class LineParser {
         switch (cmd) {
             case "CONNECT":
                 this.command = Command.CONNECT;
-                arguments.add(stringTokenizer.nextToken()); // IP Address
-                arguments.add(stringTokenizer.nextToken()); // Port
+                String ip = stringTokenizer.nextToken();
+                if (!Pattern.matches(IP_REGEX, ip)) {
+                    throw new IllegalArgumentException("Invalid IP address!");
+                }
+                arguments.add(ip);
+                String port = stringTokenizer.nextToken();
+                if (!Pattern.matches(PORT_REGEX, port)) {
+                    throw new IllegalArgumentException("Invalid port!");
+                }
+                arguments.add(port); // Port
                 break;
-            case "DISCONNECT":
-                this.command = Command.DISCONNECT;
+            case "QUIT":
+                this.command = Command.QUIT;
                 break;
             default:
                 if (!"ROCK".equals(cmd) && !"PAPER".equals(cmd) && !"SCISSORS".equals(cmd)) {

@@ -21,17 +21,26 @@ public class PrettyPrinter {
     }
 
     public static String buildCommandErrorMessage(String reason) {
-        return "\033[31m" + "Error: " + reason + "\033[0m" + "\n";
+        return "\033[31m" + "Command error: " + reason + "\033[0m" + "\n";
+    }
+
+    public static String buildNetworkErrorMessage(String reason) {
+        return "\033[31m" + "Network error: " + reason + "\033[0m" + "\n";
     }
 
     public static String buildScoreMessage(String message) {
         return "\033[36m" + TOP_BORDER + "\n" + VERTICAL_LINE + "  " + message + "\n" +
-                BOTTOM_BORDER + "\033[0m" + "\n";
+                BOTTOM_BORDER + "\n" + "\033[33m" +
+                "A new qame has started; you can always quit with '\033[35mquit\033[33m'." + "\033[0m" + "\n";
     }
 
     public static String buildStartInfoMessage() {
         return "\033[33m" + "Connect to a P2P network with '\033[35mconnect <ip> <port>\033[33m'\n" +
-                "Disconnect from the network with '\033[35mdisconnect\033[33m'" + "\033[0m" + "\n";
+                "Quit the game with '\033[35mquit\033[33m'" + "\033[0m" + "\n";
+    }
+
+    public static String buildWaitingPeersMessage() {
+        return "\033[33m" + "You have made your move! Wait for others players to join the network!" + "\033[0m" + "\n";
     }
 
     public static String buildSuccessfulConnectionMessage(int peersNumber) {
