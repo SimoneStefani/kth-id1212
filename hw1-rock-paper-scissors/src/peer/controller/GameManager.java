@@ -10,7 +10,8 @@ public class GameManager {
 
         if (peersTable.allPeersPlayed() && currentPeerInfo.getCurrentMove() != null) {
             calculateScore(peersTable, currentPeerInfo);
-            printout = "Round score: " + currentPeerInfo.getRoundScore() + " - Total score: " + currentPeerInfo.getTotalScore();
+            printout = "CURRENT ROUND SCORE: " + currentPeerInfo.getRoundScore() +
+                    " - TOTAL SCORE: " + currentPeerInfo.getTotalScore();
             peersTable.resetPeersMoves();
             currentPeerInfo.setCurrentMove(null);
             currentPeerInfo.resetRoundScore();

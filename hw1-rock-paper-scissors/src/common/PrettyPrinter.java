@@ -23,10 +23,11 @@ public class PrettyPrinter {
     public static String buildCommandErrorMessage(String reason) {
         return "\033[31m" + "Error: " + reason + "\033[0m" + "\n";
     }
-//
-//    public static String buildNumberPeersMessage(int peersNumber) {
-//        return "\033[33m" + "There are " + peersNumber + "peers connected!";
-//    }
+
+    public static String buildScoreMessage(String message) {
+        return "\033[36m" + TOP_BORDER + "\n" + VERTICAL_LINE + "  " + message + "\n" +
+                BOTTOM_BORDER + "\033[0m" + "\n";
+    }
 
     public static String buildStartInfoMessage() {
         return "\033[33m" + "Connect to a P2P network with '\033[35mconnect <ip> <port>\033[33m'\n" +

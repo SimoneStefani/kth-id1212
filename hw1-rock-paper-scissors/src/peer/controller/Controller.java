@@ -29,11 +29,11 @@ public class Controller {
         }
     }
 
-    public void joinNetwork() {
+    public void joinNetwork(String ip, int port) {
         CompletableFuture.runAsync(() -> {
             try {
                 StartupServerConnection startupServerConnection = new StartupServerConnection();
-                startupServerConnection.startConnection("127.0.0.1", 8080);
+                startupServerConnection.startConnection(ip, port);
                 peersTable = startupServerConnection.sendJoinMessage(currentPeerInfo);
                 startupServerConnection.stopConnection();
             } catch (IOException | ClassNotFoundException e) {
@@ -63,7 +63,7 @@ public class Controller {
         if (currentPeerInfo.getCurrentMove() != null) return;
         currentPeerInfo.setCurrentMove(move);
         String message = GameManager.checkEndGame(peersTable, currentPeerInfo);
-        if (!message.equals("")) console.handleMsg(message);
+        if (!message.equals("")) console.handleMsg(PrettyPrinter.buildScoreMessage(message));
 
         for (PeerInfo peer : peersTable.getPeersInfo()) {
             CompletableFuture.runAsync(() -> {
@@ -120,7 +120,7 @@ public class Controller {
             peersTable.setPeerMove(peer, move);
 
             String message = GameManager.checkEndGame(peersTable, currentPeerInfo);
-            if (!message.equals("")) console.handleMsg(message);
+            if (!message.equals("")) console.handleMsg(PrettyPrinter.buildScoreMessage(message));
         }
     }
 }
