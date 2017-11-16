@@ -7,6 +7,7 @@ import peer.net.client.StartupServerConnection;
 import peer.net.server.*;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
@@ -59,7 +60,9 @@ public class Controller {
                     peersTable.replacePeer(syncedPeerInfo);
                     peerConnection.stopConnection();
                 } catch (ClassNotFoundException | IOException e) {
-                    LOGGER.log(Level.SEVERE, e.toString(), e);
+                    if (e instanceof ConnectException) {
+                        peersTable.removePeerFromTable(peer.getId());
+                    }
                 }
             });
         }
@@ -83,7 +86,11 @@ public class Controller {
                     peerConnection.sendMoveMessage(move, currentPeerInfo);
                     peerConnection.stopConnection();
                 } catch (IOException | ClassNotFoundException e) {
-                    LOGGER.log(Level.SEVERE, e.toString(), e);
+                    if (e instanceof ConnectException) {
+                        peersTable.removePeerFromTable(peer.getId());
+                        String msg = GameManager.checkEndGame(peersTable, currentPeerInfo);
+                        if (!msg.equals("")) console.handleMsg(PrettyPrinter.buildScoreMessage(msg));
+                    }
                 }
             });
         }

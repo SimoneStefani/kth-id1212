@@ -25,12 +25,18 @@ public class LineParser {
         String cmd = stringTokenizer.nextToken().toUpperCase();
         switch (cmd) {
             case "CONNECT":
+                if (!stringTokenizer.hasMoreTokens()) {
+                    throw new IllegalArgumentException("Missing IP address!");
+                }
                 this.command = Command.CONNECT;
                 String ip = stringTokenizer.nextToken();
                 if (!Pattern.matches(IP_REGEX, ip)) {
                     throw new IllegalArgumentException("Invalid IP address!");
                 }
                 arguments.add(ip);
+                if (!stringTokenizer.hasMoreTokens()) {
+                    throw new IllegalArgumentException("Missing port!");
+                }
                 String port = stringTokenizer.nextToken();
                 if (!Pattern.matches(PORT_REGEX, port)) {
                     throw new IllegalArgumentException("Invalid port!");
