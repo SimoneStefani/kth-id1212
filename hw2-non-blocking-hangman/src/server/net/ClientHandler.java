@@ -19,7 +19,9 @@ public class ClientHandler implements Runnable {
     private final GameServer server;
     private final SocketChannel clientChannel;
     private final ByteBuffer clientMessage = ByteBuffer.allocateDirect(8192);
-    private final LinkedBlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<Message> readingQueue = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<Message> sendingQueue = new LinkedBlockingQueue<>();
+
     private SelectionKey selectionKey;
     private Game hangmanGame = new Game();
 
@@ -30,7 +32,7 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
-        Iterator<Message> iterator = messageQueue.iterator();
+        Iterator<Message> iterator = readingQueue.iterator();
         while (iterator.hasNext()) {
             Message message = iterator.next();
             switch (message.getMessageType()) {
@@ -60,14 +62,14 @@ public class ClientHandler implements Runnable {
         int numOfReadBytes = clientChannel.read(clientMessage);
         if (numOfReadBytes == -1) throw new IOException("Client has closed connection.");
 
-        messageQueue.add(deserialize(extractMessageFromBuffer()));
+        readingQueue.add(deserialize(extractMessageFromBuffer()));
         ForkJoinPool.commonPool().execute(this);
     }
 
     public void writeMessage() throws IOException {
-        synchronized (messageQueue) {
-            while (messageQueue.size() > 0) {
-                ByteBuffer message = ByteBuffer.wrap(serialize(messageQueue.poll()).getBytes());
+        synchronized (sendingQueue) {
+            while (sendingQueue.size() > 0) {
+                ByteBuffer message = ByteBuffer.wrap(serialize(sendingQueue.poll()).getBytes());
                 clientChannel.write(message);
             }
         }
@@ -96,8 +98,8 @@ public class ClientHandler implements Runnable {
     private void sendResponseToClient(String body) {
         Message message = new Message(MessageType.RESPONSE, body);
 
-        synchronized (messageQueue) {
-            messageQueue.add(message);
+        synchronized (sendingQueue) {
+            sendingQueue.add(message);
         }
 
         server.addMessageToWritingQueue(this.selectionKey);

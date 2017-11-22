@@ -7,11 +7,10 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
-import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class GameServer {
-    private final Queue<SelectionKey> writingQueue = new ArrayDeque<>();
+    private final LinkedBlockingQueue<SelectionKey> sendingQueue = new LinkedBlockingQueue<>();
     private ServerSocketChannel serverChannel;
     private Selector selector;
     private int port;
@@ -41,8 +40,8 @@ public class GameServer {
     public void run() {
         while (true) {
             try {
-                while (!writingQueue.isEmpty()) {
-                    writingQueue.poll().interestOps(SelectionKey.OP_WRITE);
+                while (!sendingQueue.isEmpty()) {
+                    sendingQueue.poll().interestOps(SelectionKey.OP_WRITE);
                 }
 
                 this.selector.select();
@@ -98,7 +97,7 @@ public class GameServer {
     }
 
     public void addMessageToWritingQueue(SelectionKey selectionKey) {
-        writingQueue.add(selectionKey);
+        sendingQueue.add(selectionKey);
     }
 
     public void wakeupSelector() {
