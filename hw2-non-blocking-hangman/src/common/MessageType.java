@@ -4,5 +4,6 @@ public enum MessageType {
     CONNECT,
     START,
     GUESS,
-    QUIT
+    QUIT,
+    RESPONSE
 }

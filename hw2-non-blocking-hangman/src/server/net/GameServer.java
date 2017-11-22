@@ -1,4 +1,4 @@
-package server;
+package server.net;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -7,9 +7,11 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
-import java.util.Iterator;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 public class GameServer {
+    private final Queue<SelectionKey> writingQueue = new ArrayDeque<>();
     private ServerSocketChannel serverChannel;
     private Selector selector;
     private int port;
@@ -39,11 +41,13 @@ public class GameServer {
     public void run() {
         while (true) {
             try {
+                while (!writingQueue.isEmpty()) {
+                    writingQueue.poll().interestOps(SelectionKey.OP_WRITE);
+                }
+
                 this.selector.select();
 
-                Iterator selectedKeys = this.selector.selectedKeys().iterator();
-                while (selectedKeys.hasNext()) {
-                    SelectionKey key = (SelectionKey) selectedKeys.next();
+                for (SelectionKey key : this.selector.selectedKeys()) {
 
                     if (!key.isValid()) continue;
 
@@ -51,7 +55,7 @@ public class GameServer {
                     else if (key.isReadable()) readFromClient(key);
                     else if (key.isWritable()) writeToClient(key);
 
-                    selectedKeys.remove();
+                    selector.selectedKeys().remove(key);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -67,37 +71,37 @@ public class GameServer {
         socketChannel.configureBlocking(false);
 
         ClientHandler handler = new ClientHandler(this, socketChannel);
-        socketChannel.register(selector, SelectionKey.OP_READ, new Client(handler));
+        SelectionKey selectionKey = socketChannel.register(selector, SelectionKey.OP_READ, handler);
+        handler.setSelectionKey(selectionKey);
     }
 
     private void readFromClient(SelectionKey key) throws IOException {
-        //System.out.println("reading from client");
-        Client client = (Client) key.attachment();
+        System.out.println("reading from client");
+        ClientHandler clientHandler = (ClientHandler) key.attachment();
         try {
-            client.handler.readMessage();
+            clientHandler.readMessage();
         } catch (IOException e) {
             removeClient(key);
         }
     }
 
     private void writeToClient(SelectionKey key) throws IOException {
-        Client client = (Client) key.attachment();
-//        try {
-//            client.handler.writeMessage();
-//        } catch (IOException e) {
-//            removeClient(key);
-//        }
+        ClientHandler clientHandler = (ClientHandler) key.attachment();
+        clientHandler.writeMessage();
+        key.interestOps(SelectionKey.OP_READ);
     }
 
     private void removeClient(SelectionKey key) throws IOException {
-        Client client = (Client) key.attachment();
+        ClientHandler clientHandler = (ClientHandler) key.attachment();
+        clientHandler.disconnectClient();
+        key.cancel();
     }
 
-    private class Client {
-        private final ClientHandler handler;
+    public void addMessageToWritingQueue(SelectionKey selectionKey) {
+        writingQueue.add(selectionKey);
+    }
 
-        private Client(ClientHandler handler) {
-            this.handler = handler;
-        }
+    public void wakeupSelector() {
+        selector.wakeup();
     }
 }

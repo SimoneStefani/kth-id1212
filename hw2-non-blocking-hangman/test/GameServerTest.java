@@ -1,6 +1,6 @@
 import org.junit.Before;
 import org.junit.Test;
-import server.GameServer;
+import server.net.GameServer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
