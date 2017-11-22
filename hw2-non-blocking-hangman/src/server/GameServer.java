@@ -32,6 +32,7 @@ public class GameServer {
         this.serverChannel.socket().bind(new InetSocketAddress(this.port));
         this.serverChannel.register(socketSelector, SelectionKey.OP_ACCEPT);
 
+        System.out.println("Started selector");
         return socketSelector;
     }
 
@@ -59,21 +60,33 @@ public class GameServer {
     }
 
     private void startHandler(SelectionKey key) throws IOException {
+        System.out.println("Starting handler");
         ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
 
         SocketChannel socketChannel = serverSocketChannel.accept();
         socketChannel.configureBlocking(false);
 
         ClientHandler handler = new ClientHandler(this, socketChannel);
-        socketChannel.register(selector, SelectionKey.OP_WRITE, new Client(handler));
+        socketChannel.register(selector, SelectionKey.OP_READ, new Client(handler));
     }
 
     private void readFromClient(SelectionKey key) throws IOException {
+        //System.out.println("reading from client");
         Client client = (Client) key.attachment();
+        try {
+            client.handler.readMessage();
+        } catch (IOException e) {
+            removeClient(key);
+        }
     }
 
     private void writeToClient(SelectionKey key) throws IOException {
         Client client = (Client) key.attachment();
+//        try {
+//            client.handler.writeMessage();
+//        } catch (IOException e) {
+//            removeClient(key);
+//        }
     }
 
     private void removeClient(SelectionKey key) throws IOException {

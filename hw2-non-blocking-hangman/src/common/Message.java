@@ -19,4 +19,12 @@ public class Message {
         String body = parts[1];
         return new Message(type, body);
     }
+
+    public MessageType getMessageType() {
+        return messageType;
+    }
+
+    public String getBody() {
+        return body;
+    }
 }
