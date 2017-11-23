@@ -16,7 +16,7 @@ public class Message {
     public static Message deserialize(String message) {
         String[] parts = message.split("##");
         MessageType type = MessageType.valueOf(parts[0].toUpperCase());
-        String body = parts[1];
+        String body = parts.length > 1 ? parts[1] : "";
         return new Message(type, body);
     }
 

@@ -2,6 +2,7 @@ package client.net;
 
 import common.Message;
 import common.MessageType;
+import common.PrettyPrinter;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -27,6 +28,7 @@ public class ServerConnection implements Runnable {
     private Selector selector;
 
     public void connect(String host, int port) {
+        System.out.println("Msg: connecting");
         this.serverAddress = new InetSocketAddress(host, port);
         new Thread(this).start();
     }
@@ -67,7 +69,7 @@ public class ServerConnection implements Runnable {
 
                     if (!key.isValid()) continue;
 
-                    if (key.isAcceptable()) establishConnection(key);
+                    if (key.isConnectable()) establishConnection(key);
                     else if (key.isReadable()) readFromServer(key);
                     else if (key.isWritable()) writeToServer(key);
 
@@ -80,6 +82,7 @@ public class ServerConnection implements Runnable {
     }
 
     private void initSelector() throws IOException {
+        System.out.println("Msg: initSelector");
         this.selector = SelectorProvider.provider().openSelector();
 
         this.socketChannel = SocketChannel.open();
@@ -102,7 +105,9 @@ public class ServerConnection implements Runnable {
     }
 
     private void establishConnection(SelectionKey key) throws IOException {
+        System.out.println("Msg: establish connection");
         this.socketChannel.finishConnect();
+        viewObserver.print(PrettyPrinter.buildStartGameMessage());
         key.interestOps(SelectionKey.OP_WRITE);
     }
 
