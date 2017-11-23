@@ -1,6 +1,7 @@
 package server.model;
 
 public class Game {
+    private WordSelector wordSelector;
     private String chosenWord;
     private String currentState;
     private int score;
@@ -8,6 +9,7 @@ public class Game {
 
     public Game() {
         this.score = 0;
+        this.wordSelector = new WordSelector();
     }
 
     public String startRound() {
@@ -28,9 +30,8 @@ public class Game {
         return buildMessage();
     }
 
-    // TODO: Implement full version to pick word from list (file)
     private String chooseWord() {
-        return "hangman".toUpperCase();
+        return wordSelector.chooseRandomWord().toUpperCase();
     }
 
     private String buildMessage() {
@@ -48,6 +49,7 @@ public class Game {
 
         if (remainingAttempts <= 1) {
             if (score > 0) score--;
+            currentState = chosenWord;
             chosenWord = null;
             return;
         }
@@ -61,6 +63,7 @@ public class Game {
         if (!chosenWord.contains(letter)) {
             if (remainingAttempts <= 1) {
                 if (score > 0) score--;
+                currentState = chosenWord;
                 chosenWord = null;
                 return;
             }
