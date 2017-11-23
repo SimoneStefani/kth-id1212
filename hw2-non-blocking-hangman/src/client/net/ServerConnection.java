@@ -28,7 +28,6 @@ public class ServerConnection implements Runnable {
     private Selector selector;
 
     public void connect(String host, int port) {
-        System.out.println("Msg: connecting");
         this.serverAddress = new InetSocketAddress(host, port);
         new Thread(this).start();
     }
@@ -82,7 +81,6 @@ public class ServerConnection implements Runnable {
     }
 
     private void initSelector() throws IOException {
-        System.out.println("Msg: initSelector");
         this.selector = SelectorProvider.provider().openSelector();
 
         this.socketChannel = SocketChannel.open();
@@ -105,7 +103,6 @@ public class ServerConnection implements Runnable {
     }
 
     private void establishConnection(SelectionKey key) throws IOException {
-        System.out.println("Msg: establish connection");
         this.socketChannel.finishConnect();
         viewObserver.print(PrettyPrinter.buildStartGameMessage());
         key.interestOps(SelectionKey.OP_WRITE);
@@ -114,12 +111,20 @@ public class ServerConnection implements Runnable {
     private void readFromServer(SelectionKey key) throws IOException {
         serverMessage.clear();
         int numOfReadBytes = socketChannel.read(serverMessage);
-        if (numOfReadBytes == -1) throw new IOException("Client has closed connection.");
+        if (numOfReadBytes == -1) throw new IOException("Client has closed connection!");
 
         readingQueue.add(deserialize(extractMessageFromBuffer()));
 
         while (readingQueue.size() > 0) {
-            viewObserver.print(readingQueue.poll().getBody());
+            Message message = readingQueue.poll();
+
+            if (message.getMessageType() == MessageType.START_RESPONSE) {
+                viewObserver.print(PrettyPrinter.buildMakeGuessMessage(message.getBody()));
+            } else if (message.getMessageType() == MessageType.GUESS_RESPONSE) {
+                viewObserver.print(PrettyPrinter.buildGuessResponseMessage(message.getBody()));
+            } else {
+                viewObserver.print(message.getBody());
+            }
         }
     }
 

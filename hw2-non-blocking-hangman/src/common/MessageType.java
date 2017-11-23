@@ -5,5 +5,6 @@ public enum MessageType {
     START,
     GUESS,
     QUIT,
-    RESPONSE
+    START_RESPONSE,
+    GUESS_RESPONSE
 }

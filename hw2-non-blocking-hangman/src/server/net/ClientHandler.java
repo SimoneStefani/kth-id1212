@@ -39,12 +39,12 @@ public class ClientHandler implements Runnable {
                 case START:
                     System.out.println("Msg: START");
                     String currentState = this.hangmanGame.startRound();
-                    sendResponseToClient(currentState);
+                    sendResponseToClient(MessageType.START_RESPONSE, currentState);
                     break;
                 case GUESS:
                     System.out.println("Msg: GUESS: " + message.getBody());
                     String currentState1 = this.hangmanGame.validateGuess(message.getBody());
-                    sendResponseToClient(currentState1);
+                    sendResponseToClient(MessageType.GUESS_RESPONSE, currentState1);
                     break;
                 case QUIT:
                     System.out.println("Msg: QUIT");
@@ -95,8 +95,8 @@ public class ClientHandler implements Runnable {
     }
 
 
-    private void sendResponseToClient(String body) {
-        Message message = new Message(MessageType.RESPONSE, body);
+    private void sendResponseToClient(MessageType messageType, String body) {
+        Message message = new Message(messageType, body);
 
         synchronized (sendingQueue) {
             sendingQueue.add(message);

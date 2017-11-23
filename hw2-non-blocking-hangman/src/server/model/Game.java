@@ -15,9 +15,7 @@ public class Game {
     public String startRound() {
         chosenWord = chooseWord();
         remainingAttempts = chosenWord.length();
-        currentState = chosenWord
-                .replaceAll("[a-zA-Z]", "_ ")
-                .substring(0, chosenWord.length() - 1);
+        currentState = chosenWord.replaceAll("[a-zA-Z]", "_");
 
         return buildMessage();
     }
@@ -37,7 +35,7 @@ public class Game {
     }
 
     private String buildMessage() {
-        return "You have to guess: " + currentState + " - [remaining attempts: "
+        return "You have to guess: " + prettifyCurrentState() + "  -  [remaining attempts: "
                 + remainingAttempts + "; score: " + score + "]";
     }
 
@@ -80,6 +78,10 @@ public class Game {
             if (chosenCharArray[i] == letterChar) currentCharArray[i] = letterChar;
         }
 
-        currentState = Arrays.toString(currentCharArray);
+        currentState = String.valueOf(currentCharArray);
+    }
+
+    private String prettifyCurrentState() {
+        return currentState.replace("", " ").trim();
     }
 }
