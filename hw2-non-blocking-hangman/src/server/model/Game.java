@@ -84,4 +84,8 @@ public class Game {
     private String prettifyCurrentState() {
         return currentState.replace("", " ").trim();
     }
+
+    public String getChosenWord() {
+        return chosenWord;
+    }
 }

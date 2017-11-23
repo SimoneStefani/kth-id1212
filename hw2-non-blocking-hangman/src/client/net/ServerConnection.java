@@ -118,12 +118,18 @@ public class ServerConnection implements Runnable {
         while (readingQueue.size() > 0) {
             Message message = readingQueue.poll();
 
-            if (message.getMessageType() == MessageType.START_RESPONSE) {
-                viewObserver.print(PrettyPrinter.buildMakeGuessMessage(message.getBody()));
-            } else if (message.getMessageType() == MessageType.GUESS_RESPONSE) {
-                viewObserver.print(PrettyPrinter.buildGuessResponseMessage(message.getBody()));
-            } else {
-                viewObserver.print(message.getBody());
+            switch (message.getMessageType()) {
+                case START_RESPONSE:
+                    viewObserver.print(PrettyPrinter.buildMakeGuessMessage(message.getBody()));
+                    break;
+                case GUESS_RESPONSE:
+                    viewObserver.print(PrettyPrinter.buildGuessResponseMessage(message.getBody()));
+                    break;
+                case END_RESPONSE:
+                    viewObserver.print(PrettyPrinter.buildEndResponseMessage(message.getBody()));
+                    break;
+                default:
+                    viewObserver.print(message.getBody());
             }
         }
     }

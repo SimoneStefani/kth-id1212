@@ -44,7 +44,11 @@ public class ClientHandler implements Runnable {
                 case GUESS:
                     System.out.println("Msg: GUESS: " + message.getBody());
                     String currentState1 = this.hangmanGame.validateGuess(message.getBody());
-                    sendResponseToClient(MessageType.GUESS_RESPONSE, currentState1);
+                    if (this.hangmanGame.getChosenWord() == null) {
+                        sendResponseToClient(MessageType.END_RESPONSE, currentState1);
+                    } else {
+                        sendResponseToClient(MessageType.GUESS_RESPONSE, currentState1);
+                    }
                     break;
                 case QUIT:
                     System.out.println("Msg: QUIT");
