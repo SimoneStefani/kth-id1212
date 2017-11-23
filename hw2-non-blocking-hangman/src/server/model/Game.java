@@ -1,7 +1,5 @@
 package server.model;
 
-import java.util.Arrays;
-
 public class Game {
     private String chosenWord;
     private String currentState;
@@ -30,6 +28,7 @@ public class Game {
         return buildMessage();
     }
 
+    // TODO: Implement full version to pick word from list (file)
     private String chooseWord() {
         return "hangman".toUpperCase();
     }

@@ -27,19 +27,31 @@ public class ServerConnection implements Runnable {
     private boolean connected = false;
     private Selector selector;
 
+    /*
+     * Connect to the server
+     */
     public void connect(String host, int port) {
         this.serverAddress = new InetSocketAddress(host, port);
         new Thread(this).start();
     }
 
+    /*
+     * Send start round message
+     */
     public void startNewRound() {
         enqueueAndSendMessage(MessageType.START, "");
     }
 
+    /*
+     * Send submit guess message
+     */
     public void submitGuess(String guess) {
         enqueueAndSendMessage(MessageType.GUESS, guess);
     }
 
+    /*
+     * Disconnect from server
+     */
     public void disconnect() throws IOException {
         this.connected = false;
         enqueueAndSendMessage(MessageType.QUIT, "");
@@ -47,6 +59,9 @@ public class ServerConnection implements Runnable {
         this.socketChannel.keyFor(selector).cancel();
     }
 
+    /*
+     * Set observer to print to console
+     */
     public void setViewObserver(CommunicationListener observer) {
         this.viewObserver = observer;
     }
@@ -118,6 +133,7 @@ public class ServerConnection implements Runnable {
         while (readingQueue.size() > 0) {
             Message message = readingQueue.poll();
 
+            // Decode message type and decide printing format
             switch (message.getMessageType()) {
                 case START_RESPONSE:
                     viewObserver.print(PrettyPrinter.buildMakeGuessMessage(message.getBody()));
@@ -152,5 +168,4 @@ public class ServerConnection implements Runnable {
         serverMessage.get(bytes);
         return new String(bytes);
     }
-
 }

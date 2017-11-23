@@ -22,8 +22,8 @@ public class ClientHandler implements Runnable {
     private final LinkedBlockingQueue<Message> readingQueue = new LinkedBlockingQueue<>();
     private final LinkedBlockingQueue<Message> sendingQueue = new LinkedBlockingQueue<>();
 
-    private SelectionKey selectionKey;
-    private Game hangmanGame = new Game();
+    private SelectionKey selectionKey; // Selection key under which this handler is registered
+    private Game hangmanGame = new Game(); // Instance of the game
 
     ClientHandler(GameServer server, SocketChannel clientChannel) {
         this.server = server;
@@ -37,12 +37,10 @@ public class ClientHandler implements Runnable {
             Message message = iterator.next();
             switch (message.getMessageType()) {
                 case START:
-                    System.out.println("Msg: START");
                     String currentState = this.hangmanGame.startRound();
                     sendResponseToClient(MessageType.START_RESPONSE, currentState);
                     break;
                 case GUESS:
-                    System.out.println("Msg: GUESS: " + message.getBody());
                     String currentState1 = this.hangmanGame.validateGuess(message.getBody());
                     if (this.hangmanGame.getChosenWord() == null) {
                         sendResponseToClient(MessageType.END_RESPONSE, currentState1);
@@ -51,17 +49,20 @@ public class ClientHandler implements Runnable {
                     }
                     break;
                 case QUIT:
-                    System.out.println("Msg: QUIT");
                     disconnectClient();
                     break;
                 default:
-                    System.out.println("Msg: ERROR");
+                    System.out.println("Message type non available!");
             }
             iterator.remove();
         }
     }
 
-    public void readMessage() throws IOException {
+    /*
+     * Read message from channel into buffer and add to
+     * reading queue. Process message in another thread.
+     */
+    void readMessage() throws IOException {
         clientMessage.clear();
         int numOfReadBytes = clientChannel.read(clientMessage);
         if (numOfReadBytes == -1) throw new IOException("Client has closed connection.");
@@ -70,7 +71,11 @@ public class ClientHandler implements Runnable {
         ForkJoinPool.commonPool().execute(this);
     }
 
-    public void writeMessage() throws IOException {
+    /*
+     * Load message from sending queue into buffer and
+     * write it to client channel.
+     */
+    void writeMessage() throws IOException {
         synchronized (sendingQueue) {
             while (sendingQueue.size() > 0) {
                 ByteBuffer message = ByteBuffer.wrap(serialize(sendingQueue.poll()).getBytes());
@@ -79,7 +84,10 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public void disconnectClient() {
+    /*
+     * Close channel with client.
+     */
+    void disconnectClient() {
         try {
             clientChannel.close();
         } catch (IOException e) {
@@ -87,7 +95,12 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public void setSelectionKey(SelectionKey selectionKey) {
+    /*
+     * Set the selection key under which the handler is
+     * registered. This is useful for the server to direct
+     * incoming requests to the correct handler.
+     */
+    void setSelectionKey(SelectionKey selectionKey) {
         this.selectionKey = selectionKey;
     }
 
@@ -98,7 +111,11 @@ public class ClientHandler implements Runnable {
         return new String(bytes);
     }
 
-
+    /*
+     * Build a message and add it to the sending queue.
+     * Then transfer it to the server writing queue and
+     * explicitly wake up selector to process it.
+     */
     private void sendResponseToClient(MessageType messageType, String body) {
         Message message = new Message(messageType, body);
 

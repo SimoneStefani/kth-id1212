@@ -33,17 +33,18 @@ public class GameServer {
         this.serverChannel.socket().bind(new InetSocketAddress(this.port));
         this.serverChannel.register(socketSelector, SelectionKey.OP_ACCEPT);
 
-        System.out.println("Started selector");
         return socketSelector;
     }
 
     public void run() {
         while (true) {
             try {
+                // First send enqueued messages
                 while (!sendingQueue.isEmpty()) {
                     sendingQueue.poll().interestOps(SelectionKey.OP_WRITE);
                 }
 
+                // Then check if there are selection keys available
                 this.selector.select();
 
                 for (SelectionKey key : this.selector.selectedKeys()) {
@@ -63,7 +64,6 @@ public class GameServer {
     }
 
     private void startHandler(SelectionKey key) throws IOException {
-        System.out.println("Starting handler");
         ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
 
         SocketChannel socketChannel = serverSocketChannel.accept();
@@ -75,7 +75,6 @@ public class GameServer {
     }
 
     private void readFromClient(SelectionKey key) throws IOException {
-        System.out.println("reading from client");
         ClientHandler clientHandler = (ClientHandler) key.attachment();
         try {
             clientHandler.readMessage();
@@ -100,6 +99,7 @@ public class GameServer {
         sendingQueue.add(selectionKey);
     }
 
+    // Wake up selector after enqueueing messages from other classes
     public void wakeupSelector() {
         selector.wakeup();
     }
