@@ -58,7 +58,8 @@ public class PrettyPrinter {
                 VERTICAL_LINE + " '\033[35munregister <username> <password>\033[36m' \n" +
                 VERTICAL_LINE + " '\033[35mlogin <username> <password>\033[36m' \n" +
                 VERTICAL_LINE + " '\033[35mlogout\033[36m' \n" +
-                VERTICAL_LINE + " '\033[35mupload <name> <permission(true/false)>\033[36m' \n" +
+                VERTICAL_LINE + " '\033[35mupload <name> <private(t/f)> <write(t/f)> <read(t/f)>\033[36m' \n" +
+                VERTICAL_LINE + " '\033[35mdownload <name>\033[36m' \n" +
                 VERTICAL_LINE + " '\033[35mlist\033[36m' \n" +
                 BOTTOM_BORDER + "\033[0m" + "\n";
     }

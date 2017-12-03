@@ -72,8 +72,10 @@ public class CatalogShell implements Runnable {
                     case LIST_FILES:
                         List<? extends FileDTO> list = user != null ? catalog.findAllFiles(user) : catalog.findAllFiles();
                         outMgr.print(PrettyPrinter.buildSimpleMessage("The catalog contains the following files:"));
+                        outMgr.println("NAME (SIZE) - PRIVATE|WRITE|READ");
                         for (FileDTO file : list) {
-                            outMgr.println(file.getName());
+                            outMgr.println(file.getName() + " (" + file.getDimension() + "bytes) - " + file.hasPrivateAccess() +
+                            "|" + file.hasWritePermission() + "|" + file.hasReadPermission());
                         }
                         break;
                     case GET_FILE:
