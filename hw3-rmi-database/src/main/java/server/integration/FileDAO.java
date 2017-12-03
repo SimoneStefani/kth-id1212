@@ -32,6 +32,23 @@ public class FileDAO {
         return files;
     }
 
+    public File findFileByName(String name) {
+        EntityManager entityManager = openEntityManager();
+
+        Query query = entityManager.createQuery("SELECT f FROM File f WHERE f.name=:name");
+        query.setParameter("name", name);
+        File file;
+
+        try {
+            file = (File) query.getSingleResult();
+        } catch (NoResultException e) {
+            file = null;
+        }
+
+        entityManager.close();
+        return file;
+    }
+
     public void storeFile(File file) {
         EntityManager entityManager = beginTransaction();
         entityManager.persist(file);

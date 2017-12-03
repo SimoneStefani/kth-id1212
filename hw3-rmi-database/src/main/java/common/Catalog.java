@@ -1,5 +1,6 @@
 package common;
 
+import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -16,5 +17,7 @@ public interface Catalog extends Remote {
 
     public List<? extends FileDTO> findAllFiles() throws RemoteException;
 
-    public void storeFile(UserDTO owner, String name, boolean privateAccess) throws RemoteException;
+    public void storeFile(UserDTO owner, String name, byte[] content, boolean privateAccess, boolean publicWrite, boolean publicRead) throws IOException;
+
+    public byte[] getFile(UserDTO user, String name) throws IOException;
 }

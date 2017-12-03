@@ -52,6 +52,15 @@ public class LineParser {
                 arguments.add(stringTokenizer.nextToken());
                 if (!stringTokenizer.hasMoreTokens()) throw new IllegalArgumentException("Missing permission");
                 arguments.add(stringTokenizer.nextToken());
+                if (!stringTokenizer.hasMoreTokens()) throw new IllegalArgumentException("Missing public write");
+                arguments.add(stringTokenizer.nextToken());
+                if (!stringTokenizer.hasMoreTokens()) throw new IllegalArgumentException("Missing public read");
+                arguments.add(stringTokenizer.nextToken());
+                break;
+            case "DOWNLOAD":
+                this.command = Command.GET_FILE;
+                if (!stringTokenizer.hasMoreTokens()) throw new IllegalArgumentException("Missing file name");
+                arguments.add(stringTokenizer.nextToken());
                 break;
             case "LIST":
                 this.command = Command.LIST_FILES;

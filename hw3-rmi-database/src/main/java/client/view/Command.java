@@ -6,6 +6,7 @@ public enum Command {
     LOGIN,
     LOGOUT,
     STORE_FILE,
+    GET_FILE,
     LIST_FILES,
     HELP,
     QUIT,

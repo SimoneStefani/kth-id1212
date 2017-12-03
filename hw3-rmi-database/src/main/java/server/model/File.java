@@ -25,14 +25,19 @@ public class File implements FileDTO {
 
     private boolean writePermission;
 
+    private long dimension;
+
     private Date createdAt;
 
     private Date updatedAt;
 
-    public File(User owner, String name, boolean privateAccess) {
+    public File(User owner, String name, boolean privateAccess, boolean readPermission, boolean writePermission, long dimension) {
         this.owner = owner;
         this.name = name;
         this.privateAccess = privateAccess;
+        this.readPermission = readPermission;
+        this.writePermission = writePermission;
+        this.dimension = dimension;
     }
 
     public File() {
@@ -95,6 +100,14 @@ public class File implements FileDTO {
 
     public void setWritePermission(boolean writePermission) {
         this.writePermission = writePermission;
+    }
+
+    public long getDimension() {
+        return dimension;
+    }
+
+    public void setDimension(long dimension) {
+        this.dimension = dimension;
     }
 
     public Date getCreatedAt() {

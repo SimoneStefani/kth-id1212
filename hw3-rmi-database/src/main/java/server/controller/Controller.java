@@ -7,8 +7,11 @@ import org.mindrot.jbcrypt.BCrypt;
 import server.integration.FileDAO;
 import server.integration.UserDAO;
 import server.model.File;
+import server.model.FileManager;
 import server.model.User;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
@@ -41,12 +44,13 @@ public class Controller extends UnicastRemoteObject implements Catalog {
     }
 
     @Override
-    public User loginUser(String username, String password) {
+    public User loginUser(String username, String password) throws RemoteException {
         User user = userDAO.findUserByUsername(username);
         if (user != null && BCrypt.checkpw(password, user.getPassword())) {
             return user;
+        } else {
+            throw new RemoteException("Invalid credentials!");
         }
-        return null;
     }
 
     @Override
@@ -61,7 +65,21 @@ public class Controller extends UnicastRemoteObject implements Catalog {
     }
 
     @Override
-    public void storeFile(UserDTO owner, String name, boolean privateAccess) {
-        fileDAO.storeFile(new File(userDAO.findUserByUsername(owner.getUsername()), name, privateAccess));
+    public void storeFile(UserDTO owner, String name, byte[] content, boolean privateAccess, boolean publicWrite, boolean publicRead) throws IOException {
+        if (fileDAO.findFileByName(name) == null) {
+            fileDAO.storeFile(new File(userDAO.findUserByUsername(owner.getUsername()), name, privateAccess, publicWrite, publicRead, content.length));
+            FileManager.persistFile(name, content);
+        } else {
+            throw new RemoteException("The file '" + name + "' already exists!");
+        }
+
     }
+
+    @Override
+    public byte[] getFile(UserDTO userDTO, String name) throws IOException {
+        User user = userDAO.findUserByUsername(userDTO.getUsername());
+
+        return FileManager.getFile(name);
+    }
+
 }

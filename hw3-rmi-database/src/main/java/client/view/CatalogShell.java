@@ -1,10 +1,12 @@
 package client.view;
 
+import client.FileUtility;
 import common.Catalog;
 import common.FileDTO;
 import common.PrettyPrinter;
 import common.UserDTO;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Scanner;
@@ -55,7 +57,13 @@ public class CatalogShell implements Runnable {
                         break;
                     case STORE_FILE:
                         if (this.user != null) {
-                            catalog.storeFile(this.user, parsedLine.getArgument(0), Boolean.parseBoolean(parsedLine.getArgument(1)));
+                            byte[] data = FileUtility.readFile(parsedLine.getArgument(0));
+                            catalog.storeFile(
+                                    this.user, parsedLine.getArgument(0), data,
+                                    Boolean.parseBoolean(parsedLine.getArgument(1)),
+                                    Boolean.parseBoolean(parsedLine.getArgument(2)),
+                                    Boolean.parseBoolean(parsedLine.getArgument(3))
+                            );
                             outMgr.println(PrettyPrinter.buildSimpleMessage("File uploaded successfully!"));
                         } else {
                             outMgr.println(PrettyPrinter.buildSimpleMessage("You need to be logged in to upload a file!"));
@@ -68,6 +76,10 @@ public class CatalogShell implements Runnable {
                             outMgr.println(file.getName());
                         }
                         break;
+                    case GET_FILE:
+                        FileUtility.writeFile(parsedLine.getArgument(0), catalog.getFile(user, parsedLine.getArgument(0)));
+                        outMgr.println(PrettyPrinter.buildSimpleMessage("File downloaded successfully!"));
+                        break;
                     case HELP:
                         outMgr.print(PrettyPrinter.buildHelpMessage());
                         break;
@@ -78,7 +90,7 @@ public class CatalogShell implements Runnable {
                         break;
                 }
                 outMgr.print(PROMPT);
-            } catch (IllegalArgumentException | RemoteException e) {
+            } catch (IllegalArgumentException | IOException e) {
                 outMgr.print(PrettyPrinter.buildCommandErrorMessage(e.getMessage()));
                 outMgr.print(PROMPT);
             }

@@ -1,6 +1,5 @@
 package server.integration;
 
-import server.model.File;
 import server.model.User;
 
 import javax.persistence.*;
