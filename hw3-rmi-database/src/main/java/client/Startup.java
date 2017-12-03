@@ -17,6 +17,5 @@ public class Startup {
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             System.out.println("Could not start catalog shell!");
         }
-
     }
 }
