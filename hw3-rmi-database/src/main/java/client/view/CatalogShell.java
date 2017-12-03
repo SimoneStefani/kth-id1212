@@ -40,7 +40,13 @@ public class CatalogShell implements Runnable {
                 Command command = parsedLine.getCommand();
 
                 // check if user is authenticated
-                if (user == null && !command.equals(Command.REGISTER) && !command.equals(Command.UNREGISTER) && !command.equals(Command.LOGIN)) {
+                if (user == null && !command.equals(Command.REGISTER) &&
+                        !command.equals(Command.UNREGISTER) &&
+                        !command.equals(Command.LOGIN) &&
+                        !command.equals(Command.QUIT) &&
+                        !command.equals(Command.HELP) &&
+                        !command.equals(Command.NO_COMMAND)
+                ) {
                     outMgr.print(PrettyPrinter.buildSimpleMessage("Please login to interact with the file catalog."));
                     outMgr.print(PROMPT);
                     continue;
