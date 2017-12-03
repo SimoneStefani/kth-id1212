@@ -37,7 +37,16 @@ public class CatalogShell implements Runnable {
         while (running) {
             try {
                 LineParser parsedLine = new LineParser(console.nextLine());
-                switch (parsedLine.getCommand()) {
+                Command command = parsedLine.getCommand();
+
+                // check if user is authenticated
+                if (user == null && !command.equals(Command.REGISTER) && !command.equals(Command.UNREGISTER) && !command.equals(Command.LOGIN)) {
+                    outMgr.print(PrettyPrinter.buildSimpleMessage("Please login to interact with the file catalog."));
+                    outMgr.print(PROMPT);
+                    continue;
+                }
+
+                switch (command) {
                     case REGISTER:
                         catalog.registerUser(parsedLine.getArgument(0), parsedLine.getArgument(1));
                         outMgr.println(PrettyPrinter.buildSimpleMessage("User '" + parsedLine.getArgument(0) + "' successfully registered!"));
@@ -70,11 +79,6 @@ public class CatalogShell implements Runnable {
                         }
                         break;
                     case LIST_FILES:
-                        if (user == null) {
-                            outMgr.print(PrettyPrinter.buildSimpleMessage("Please login to interact with the file catalog."));
-                            break;
-                        }
-
                         List<? extends FileDTO> list = user != null ? catalog.findAllFiles(user) : catalog.findAllFiles();
                         outMgr.print(PrettyPrinter.buildSimpleMessage("The catalog contains the following files:"));
                         outMgr.println("NAME (SIZE) - PRIVATE|WRITE|READ");
