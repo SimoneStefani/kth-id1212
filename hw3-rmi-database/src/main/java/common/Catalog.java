@@ -20,4 +20,8 @@ public interface Catalog extends Remote {
     public void storeFile(UserDTO owner, String name, byte[] content, boolean privateAccess, boolean publicWrite, boolean publicRead) throws IOException;
 
     public byte[] getFile(UserDTO user, String name) throws IOException;
+
+    public void updateFile(UserDTO owner, String name, byte[] content, boolean privateAccess, boolean publicWrite, boolean publicRead) throws IOException;
+
+    public void deleteFile(UserDTO user, String name) throws IOException;
 }

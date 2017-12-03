@@ -75,12 +75,38 @@ public class CatalogShell implements Runnable {
                         outMgr.println("NAME (SIZE) - PRIVATE|WRITE|READ");
                         for (FileDTO file : list) {
                             outMgr.println(file.getName() + " (" + file.getDimension() + "bytes) - " + file.hasPrivateAccess() +
-                            "|" + file.hasWritePermission() + "|" + file.hasReadPermission());
+                                    "|" + file.hasWritePermission() + "|" + file.hasReadPermission());
                         }
                         break;
                     case GET_FILE:
-                        FileUtility.writeFile(parsedLine.getArgument(0), catalog.getFile(user, parsedLine.getArgument(0)));
-                        outMgr.println(PrettyPrinter.buildSimpleMessage("File downloaded successfully!"));
+                        if (this.user != null) {
+                            FileUtility.writeFile(parsedLine.getArgument(0), catalog.getFile(user, parsedLine.getArgument(0)));
+                            outMgr.println(PrettyPrinter.buildSimpleMessage("File downloaded successfully!"));
+                        } else {
+                            outMgr.println(PrettyPrinter.buildSimpleMessage("You need to be logged in to download a file!"));
+                        }
+                        break;
+                    case DELETE_FILE:
+                        if (this.user != null) {
+                            catalog.deleteFile(user, parsedLine.getArgument(0));
+                            outMgr.println(PrettyPrinter.buildSimpleMessage("File deleted successfully!"));
+                        } else {
+                            outMgr.println(PrettyPrinter.buildSimpleMessage("You need to be logged in to delete a file!"));
+                        }
+                        break;
+                    case UPDATE_FILE:
+                        if (this.user != null) {
+                            byte[] data = FileUtility.readFile(parsedLine.getArgument(0));
+                            catalog.updateFile(
+                                    this.user, parsedLine.getArgument(0), data,
+                                    Boolean.parseBoolean(parsedLine.getArgument(1)),
+                                    Boolean.parseBoolean(parsedLine.getArgument(2)),
+                                    Boolean.parseBoolean(parsedLine.getArgument(3))
+                            );
+                            outMgr.println(PrettyPrinter.buildSimpleMessage("File updated successfully!"));
+                        } else {
+                            outMgr.println(PrettyPrinter.buildSimpleMessage("You need to be logged in to update a file!"));
+                        }
                         break;
                     case HELP:
                         outMgr.print(PrettyPrinter.buildHelpMessage());

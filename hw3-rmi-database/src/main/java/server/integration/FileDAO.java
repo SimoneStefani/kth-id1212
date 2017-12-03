@@ -55,9 +55,15 @@ public class FileDAO {
         commitTransaction();
     }
 
+    public void updateFile(File file) {
+        EntityManager entityManager = beginTransaction();
+        entityManager.merge(file);
+        commitTransaction();
+    }
+
     public void destroyFile(File file) {
         EntityManager entityManager = beginTransaction();
-        entityManager.remove(file);
+        entityManager.remove(entityManager.merge(file));
         commitTransaction();
     }
 

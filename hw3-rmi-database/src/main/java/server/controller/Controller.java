@@ -78,8 +78,44 @@ public class Controller extends UnicastRemoteObject implements Catalog {
     @Override
     public byte[] getFile(UserDTO userDTO, String name) throws IOException {
         User user = userDAO.findUserByUsername(userDTO.getUsername());
+        File file = fileDAO.findFileByName(name);
 
-        return FileManager.getFile(name);
+        if (file == null) {
+            throw new RemoteException("The file '" + name + "' does not exists!");
+        } else if (file.getOwner().getId() == user.getId() || (!file.hasPrivateAccess() && file.hasReadPermission())) {
+            return FileManager.getFile(name);
+        } else {
+            throw new RemoteException("You don't have the permission to download this file");
+        }
     }
 
+    @Override
+    public void updateFile(UserDTO owner, String name, byte[] content, boolean privateAccess, boolean publicWrite, boolean publicRead) throws IOException {
+        User user = userDAO.findUserByUsername(owner.getUsername());
+        File file = fileDAO.findFileByName(name);
+
+        if (file == null) {
+            throw new RemoteException("The file '" + name + "' does not exists!");
+        } else if (file.getOwner().getId() == user.getId() || (!file.hasPrivateAccess() && file.hasWritePermission())) {
+            fileDAO.updateFile(new File(userDAO.findUserByUsername(owner.getUsername()), name, privateAccess, publicWrite, publicRead, content.length));
+            FileManager.persistFile(name, content);
+        } else {
+            throw new RemoteException("You don't have the permission to update this file");
+        }
+    }
+
+    @Override
+    public void deleteFile(UserDTO userDTO, String name) throws IOException {
+        User user = userDAO.findUserByUsername(userDTO.getUsername());
+        File file = fileDAO.findFileByName(name);
+
+        if (file == null) {
+            throw new RemoteException("The file '" + name + "' does not exists!");
+        } else if (file.getOwner().getId() == user.getId() || (!file.hasPrivateAccess() && file.hasWritePermission())) {
+            fileDAO.destroyFile(file);
+            FileManager.deleteFile(name);
+        } else {
+            throw new RemoteException("You don't have the permission to delete this file");
+        }
+    }
 }

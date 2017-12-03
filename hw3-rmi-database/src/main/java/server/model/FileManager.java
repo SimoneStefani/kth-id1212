@@ -18,4 +18,9 @@ public class FileManager {
         Path path = workingDir.resolve(Paths.get(name));
         Files.write(path, data);
     }
+
+    public static void deleteFile(String name) throws IOException {
+        Path path = workingDir.resolve(Paths.get(name));
+        Files.deleteIfExists(path);
+    }
 }

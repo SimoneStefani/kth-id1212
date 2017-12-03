@@ -31,7 +31,7 @@ public class File implements FileDTO {
 
     private Date updatedAt;
 
-    public File(User owner, String name, boolean privateAccess, boolean readPermission, boolean writePermission, long dimension) {
+    public File(User owner, String name, boolean privateAccess, boolean writePermission, boolean readPermission, long dimension) {
         this.owner = owner;
         this.name = name;
         this.privateAccess = privateAccess;

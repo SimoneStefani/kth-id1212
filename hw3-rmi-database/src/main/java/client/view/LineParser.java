@@ -62,6 +62,22 @@ public class LineParser {
                 if (!stringTokenizer.hasMoreTokens()) throw new IllegalArgumentException("Missing file name");
                 arguments.add(stringTokenizer.nextToken());
                 break;
+            case "UPDATE":
+                this.command = Command.UPDATE_FILE;
+                if (!stringTokenizer.hasMoreTokens()) throw new IllegalArgumentException("Missing name");
+                arguments.add(stringTokenizer.nextToken());
+                if (!stringTokenizer.hasMoreTokens()) throw new IllegalArgumentException("Missing permission");
+                arguments.add(stringTokenizer.nextToken());
+                if (!stringTokenizer.hasMoreTokens()) throw new IllegalArgumentException("Missing public write");
+                arguments.add(stringTokenizer.nextToken());
+                if (!stringTokenizer.hasMoreTokens()) throw new IllegalArgumentException("Missing public read");
+                arguments.add(stringTokenizer.nextToken());
+                break;
+            case "REMOVE":
+                this.command = Command.DELETE_FILE;
+                if (!stringTokenizer.hasMoreTokens()) throw new IllegalArgumentException("Missing file name");
+                arguments.add(stringTokenizer.nextToken());
+                break;
             case "LIST":
                 this.command = Command.LIST_FILES;
                 break;
