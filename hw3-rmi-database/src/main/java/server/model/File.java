@@ -1,28 +1,39 @@
 package server.model;
 
+import common.FileDTO;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-public class File {
+public class File implements FileDTO {
 
     @Id
     @GeneratedValue
     private int id;
 
     @ManyToOne
-    private User user;
+    private User owner;
 
     @NaturalId
     private String name;
 
     private boolean privateAccess;
 
+    private boolean readPermission;
+
+    private boolean writePermission;
+
     private Date createdAt;
 
     private Date updatedAt;
+
+    public File(User owner, String name, boolean privateAccess) {
+        this.owner = owner;
+        this.name = name;
+        this.privateAccess = privateAccess;
+    }
 
     @PrePersist
     private void onCreate() {
@@ -43,12 +54,12 @@ public class File {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public User getOwner() {
+        return owner;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
     public String getName() {
@@ -59,12 +70,28 @@ public class File {
         this.name = name;
     }
 
-    public boolean isPrivateAccess() {
+    public boolean hasPrivateAccess() {
         return privateAccess;
     }
 
     public void setPrivateAccess(boolean privateAccess) {
         this.privateAccess = privateAccess;
+    }
+
+    public boolean hasReadPermission() {
+        return readPermission;
+    }
+
+    public void setReadPermission(boolean readPermission) {
+        this.readPermission = readPermission;
+    }
+
+    public boolean hasWritePermission() {
+        return writePermission;
+    }
+
+    public void setWritePermission(boolean writePermission) {
+        this.writePermission = writePermission;
     }
 
     public Date getCreatedAt() {

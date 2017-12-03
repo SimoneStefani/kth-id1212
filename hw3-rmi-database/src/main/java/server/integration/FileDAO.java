@@ -1,43 +1,46 @@
 package server.integration;
 
+import server.model.File;
 import server.model.User;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class UserDAO {
+public class FileDAO {
     private final EntityManagerFactory entityManagerFactory;
     private final ThreadLocal<EntityManager> managerThreadLocal = new ThreadLocal<>();
 
-    public UserDAO() {
+    public FileDAO() {
         this.entityManagerFactory = Persistence.createEntityManagerFactory("org.hibernate.netprog.jpa");
     }
 
-    public User findUserByUsername(String username) {
+    public List<File> findAllFiles(User owner) {
         EntityManager entityManager = openEntityManager();
 
-        Query query = entityManager.createQuery("SELECT u FROM User u WHERE u.username=:username");
-        query.setParameter("username", username);
-        User user;
+        Query query = entityManager.createQuery("SELECT f FROM File f WHERE (f.privateAccess=false OR f.owner=:owner)");
+        query.setParameter("owner", owner);
+        List<File> files;
 
         try {
-            user = (User) query.getSingleResult();
+            files = query.getResultList();
         } catch (NoResultException e) {
-            user = null;
+            files = new ArrayList<>();
         }
 
         entityManager.close();
-        return user;
+        return files;
     }
 
-    public void storeUser(User user) {
+    public void storeFile(File file) {
         EntityManager entityManager = beginTransaction();
-        entityManager.persist(user);
+        entityManager.persist(file);
         commitTransaction();
     }
 
-    public void destroyUser(User user) {
+    public void destroyFile(File file) {
         EntityManager entityManager = beginTransaction();
-        entityManager.remove(user);
+        entityManager.remove(file);
         commitTransaction();
     }
 
