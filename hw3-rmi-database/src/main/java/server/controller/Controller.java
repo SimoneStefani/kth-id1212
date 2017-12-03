@@ -46,7 +46,7 @@ public class Controller extends UnicastRemoteObject implements Catalog {
     }
 
     @Override
-    public User loginUser(String username, String password) throws RemoteException {
+    public UserDTO loginUser(String username, String password) throws RemoteException {
         User user = userDAO.findUserByUsername(username);
         if (user != null && BCrypt.checkpw(password, user.getPassword())) {
             return user;
