@@ -1,6 +1,7 @@
 package server.model;
 
 import org.hibernate.annotations.NaturalId;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -26,6 +27,14 @@ public class User {
 
     private Date updatedAt;
 
+    public User() {
+    }
+
+    public User(String username, String password) {
+        this.username = username;
+        this.setPassword(password);
+    }
+
     @PrePersist
     private void onCreate() {
         this.createdAt = new Date();
@@ -36,6 +45,7 @@ public class User {
     private void onUpdate() {
         this.updatedAt = new Date();
     }
+
 
     public int getId() {
         return id;
@@ -58,7 +68,7 @@ public class User {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = BCrypt.hashpw(password, BCrypt.gensalt(10));
     }
 
     public List<File> getFiles() {
