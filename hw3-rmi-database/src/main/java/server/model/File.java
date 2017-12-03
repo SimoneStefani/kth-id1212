@@ -35,6 +35,9 @@ public class File implements FileDTO {
         this.privateAccess = privateAccess;
     }
 
+    public File() {
+    }
+
     @PrePersist
     private void onCreate() {
         this.createdAt = new Date();

@@ -25,7 +25,7 @@ public class Controller extends UnicastRemoteObject implements Catalog {
 
     @Override
     public void registerUser(String username, String password) {
-        if (userDAO.findUserByUsername(username) != null) {
+        if (userDAO.findUserByUsername(username) == null) {
             userDAO.storeUser(new User(username, password));
         }
     }

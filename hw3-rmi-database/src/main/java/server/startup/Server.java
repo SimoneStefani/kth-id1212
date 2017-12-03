@@ -16,6 +16,7 @@ public class Server {
             System.out.println("Catalog server started...");
         } catch (RemoteException | MalformedURLException e) {
             System.out.println("Failed to start catalog server!");
+            e.printStackTrace();
         }
     }
 

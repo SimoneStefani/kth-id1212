@@ -4,12 +4,13 @@ import org.hibernate.annotations.NaturalId;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
-public class User {
+public class User implements Serializable {
 
     @Id
     @GeneratedValue
@@ -20,8 +21,8 @@ public class User {
 
     private String password;
 
-    @OneToMany(mappedBy = "user")
-    private List<File> files = new ArrayList<File>();
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<File> files = new ArrayList<>();
 
     private Date createdAt;
 

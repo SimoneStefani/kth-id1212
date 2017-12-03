@@ -1,5 +1,6 @@
 package server.integration;
 
+import server.model.File;
 import server.model.User;
 
 import javax.persistence.*;
@@ -37,7 +38,7 @@ public class UserDAO {
 
     public void destroyUser(User user) {
         EntityManager entityManager = beginTransaction();
-        entityManager.remove(user);
+        entityManager.remove(entityManager.merge(user));
         commitTransaction();
     }
 
