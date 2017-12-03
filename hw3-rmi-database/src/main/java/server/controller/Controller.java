@@ -1,6 +1,7 @@
 package server.controller;
 
 import common.Catalog;
+import common.ClientRemote;
 import common.FileDTO;
 import common.UserDTO;
 import org.mindrot.jbcrypt.BCrypt;
@@ -11,14 +12,15 @@ import server.model.FileManager;
 import server.model.User;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 import java.util.List;
 
 public class Controller extends UnicastRemoteObject implements Catalog {
     private final UserDAO userDAO;
     private final FileDAO fileDAO;
+    private HashMap<Integer, ClientRemote> notifiableUsers = new HashMap();
 
     public Controller() throws RemoteException {
         super();
@@ -83,6 +85,7 @@ public class Controller extends UnicastRemoteObject implements Catalog {
         if (file == null) {
             throw new RemoteException("The file '" + name + "' does not exists!");
         } else if (file.getOwner().getId() == user.getId() || (!file.hasPrivateAccess() && file.hasReadPermission())) {
+            if (notifiableUsers.containsKey(file.getId())) notifyClient(file.getId(), file.getName(), "downloaded");
             return FileManager.getFile(name);
         } else {
             throw new RemoteException("You don't have the permission to download this file");
@@ -98,6 +101,7 @@ public class Controller extends UnicastRemoteObject implements Catalog {
             throw new RemoteException("The file '" + name + "' does not exists!");
         } else if (file.getOwner().getId() == user.getId() || (!file.hasPrivateAccess() && file.hasWritePermission())) {
             fileDAO.updateFile(new File(userDAO.findUserByUsername(owner.getUsername()), name, privateAccess, publicWrite, publicRead, content.length));
+            if (notifiableUsers.containsKey(file.getId())) notifyClient(file.getId(), file.getName(), "updated");
             FileManager.persistFile(name, content);
         } else {
             throw new RemoteException("You don't have the permission to update this file");
@@ -113,9 +117,30 @@ public class Controller extends UnicastRemoteObject implements Catalog {
             throw new RemoteException("The file '" + name + "' does not exists!");
         } else if (file.getOwner().getId() == user.getId() || (!file.hasPrivateAccess() && file.hasWritePermission())) {
             fileDAO.destroyFile(file);
+            if (notifiableUsers.containsKey(file.getId())) notifyClient(file.getId(), file.getName(), "deleted");
             FileManager.deleteFile(name);
         } else {
             throw new RemoteException("You don't have the permission to delete this file");
         }
+    }
+
+    @Override
+    public void notify(UserDTO userDTO, String name, ClientRemote outputHandler) throws RemoteException {
+        System.out.println("Works?");
+        User user = userDAO.findUserByUsername(userDTO.getUsername());
+        File file = fileDAO.findFileByName(name);
+
+        if (file == null) {
+            throw new RemoteException("The file '" + name + "' does not exists!");
+        } else if (file.getOwner().getId() == user.getId()) {
+            notifiableUsers.put(file.getId(), outputHandler);
+        } else {
+            throw new RemoteException("You don't have the permission be notified!");
+        }
+    }
+
+    private void notifyClient(int fileId, String fileName, String action) throws RemoteException {
+        ClientRemote outputHandler = notifiableUsers.get(fileId);
+        outputHandler.outputMessage("A user has " + action + " the file " + fileName);
     }
 }

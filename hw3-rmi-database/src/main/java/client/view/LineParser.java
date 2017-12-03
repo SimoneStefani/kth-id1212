@@ -2,7 +2,6 @@ package client.view;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-import java.util.regex.Pattern;
 
 public class LineParser {
     private ArrayList<String> arguments = new ArrayList<>();
@@ -80,6 +79,11 @@ public class LineParser {
                 break;
             case "LIST":
                 this.command = Command.LIST_FILES;
+                break;
+            case "NOTIFY":
+                this.command = Command.NOTIFY;
+                if (!stringTokenizer.hasMoreTokens()) throw new IllegalArgumentException("Missing file name");
+                arguments.add(stringTokenizer.nextToken());
                 break;
             case "QUIT":
                 this.command = Command.QUIT;

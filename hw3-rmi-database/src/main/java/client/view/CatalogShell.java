@@ -1,13 +1,11 @@
 package client.view;
 
 import client.FileUtility;
-import common.Catalog;
-import common.FileDTO;
-import common.PrettyPrinter;
-import common.UserDTO;
+import common.*;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.Scanner;
 
@@ -15,12 +13,19 @@ public class CatalogShell implements Runnable {
     private static final String PROMPT = ">> ";
     private final ThreadSafeStdOut outMgr = new ThreadSafeStdOut();
     private final Scanner console = new Scanner(System.in);
+    private NotificationServer outputHandler;
     private Catalog catalog;
     private UserDTO user = null;
     private boolean running = false;
 
     public void start(Catalog catalog) {
         this.catalog = catalog;
+
+        try {
+            this.outputHandler = new NotificationServer();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
 
         if (running) return;
         running = true;
@@ -108,6 +113,13 @@ public class CatalogShell implements Runnable {
                             outMgr.println(PrettyPrinter.buildSimpleMessage("You need to be logged in to update a file!"));
                         }
                         break;
+                    case NOTIFY:
+                        if (this.user != null) {
+                            catalog.notify(this.user, parsedLine.getArgument(0), this.outputHandler);
+                        } else {
+                            outMgr.println(PrettyPrinter.buildSimpleMessage("You need to be logged in to receive notifications!"));
+                        }
+                        break;
                     case HELP:
                         outMgr.print(PrettyPrinter.buildHelpMessage());
                         break;
@@ -119,9 +131,21 @@ public class CatalogShell implements Runnable {
                 }
                 outMgr.print(PROMPT);
             } catch (IllegalArgumentException | IOException e) {
+                e.printStackTrace();
                 outMgr.print(PrettyPrinter.buildCommandErrorMessage(e.getMessage()));
                 outMgr.print(PROMPT);
             }
+        }
+    }
+
+    private class NotificationServer extends UnicastRemoteObject implements ClientRemote {
+        public NotificationServer() throws RemoteException {
+        }
+
+        @Override
+        public void outputMessage(String message) throws RemoteException {
+            outMgr.println(PrettyPrinter.buildSimpleMessage(message));
+            outMgr.print(PROMPT);
         }
     }
 

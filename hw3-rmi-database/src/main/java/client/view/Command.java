@@ -10,6 +10,7 @@ public enum Command {
     LIST_FILES,
     DELETE_FILE,
     UPDATE_FILE,
+    NOTIFY,
     HELP,
     QUIT,
     NO_COMMAND

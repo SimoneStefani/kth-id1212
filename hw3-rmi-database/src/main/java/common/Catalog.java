@@ -7,21 +7,23 @@ import java.util.List;
 
 public interface Catalog extends Remote {
 
-    public void registerUser(String username, String password) throws RemoteException;
+    void registerUser(String username, String password) throws RemoteException;
 
-    public void unregisterUser(String username, String password) throws RemoteException;
+    void unregisterUser(String username, String password) throws RemoteException;
 
-    public UserDTO loginUser(String username, String password) throws RemoteException;
+    UserDTO loginUser(String username, String password) throws RemoteException;
 
-    public List<? extends FileDTO> findAllFiles(UserDTO owner) throws RemoteException;
+    List<? extends FileDTO> findAllFiles(UserDTO owner) throws RemoteException;
 
-    public List<? extends FileDTO> findAllFiles() throws RemoteException;
+    List<? extends FileDTO> findAllFiles() throws RemoteException;
 
-    public void storeFile(UserDTO owner, String name, byte[] content, boolean privateAccess, boolean publicWrite, boolean publicRead) throws IOException;
+    void storeFile(UserDTO owner, String name, byte[] content, boolean privateAccess, boolean publicWrite, boolean publicRead) throws IOException;
 
-    public byte[] getFile(UserDTO user, String name) throws IOException;
+    byte[] getFile(UserDTO user, String name) throws IOException;
 
-    public void updateFile(UserDTO owner, String name, byte[] content, boolean privateAccess, boolean publicWrite, boolean publicRead) throws IOException;
+    void updateFile(UserDTO owner, String name, byte[] content, boolean privateAccess, boolean publicWrite, boolean publicRead) throws IOException;
 
-    public void deleteFile(UserDTO user, String name) throws IOException;
+    void deleteFile(UserDTO user, String name) throws IOException;
+
+    void notify(UserDTO user, String name, ClientRemote outputHandler) throws RemoteException;
 }
