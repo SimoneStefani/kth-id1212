@@ -38,11 +38,12 @@ public class PrettyPrinter {
                 "You can start a new game with '\033[35mstart\033[33m'" + "\033[0m" + "\n";
     }
 
-    public static String buildMakeGuessMessage(String message) {
-        return "\033[36m" + TOP_BORDER + "\n" + VERTICAL_LINE + " You have started a new game!" + "\n" + MIDDLE_BORDER +
-                "\n" + VERTICAL_LINE + " " + message + "\n" + BOTTOM_BORDER + "\n" + "\033[33m" +
-                "Go on and type a guess for a letter or the word; you can always quit with '\033[35mquit\033[33m'." +
-                "\033[0m" + "\n";
+    public static String buildSimpleMessage(String message) {
+        return "\033[33m" + message + "\033[0m" + "\n";
+    }
+
+    public static String buildSimpleErrorMessage(String message) {
+        return "\033[31m" + message + "\033[0m" + "\n";
     }
 
     public static String buildStartInfoMessage() {

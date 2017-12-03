@@ -1,5 +1,6 @@
 package server.model;
 
+import common.UserDTO;
 import org.hibernate.annotations.NaturalId;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -10,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-public class User implements Serializable {
+public class User implements Serializable, UserDTO {
 
     @Id
     @GeneratedValue
@@ -86,15 +87,5 @@ public class User implements Serializable {
 
     public Date getUpdatedAt() {
         return updatedAt;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", files=" + files +
-                '}';
     }
 }

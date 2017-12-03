@@ -2,6 +2,7 @@ package server.controller;
 
 import common.Catalog;
 import common.FileDTO;
+import common.UserDTO;
 import org.mindrot.jbcrypt.BCrypt;
 import server.integration.FileDAO;
 import server.integration.UserDAO;
@@ -15,7 +16,6 @@ import java.util.List;
 public class Controller extends UnicastRemoteObject implements Catalog {
     private final UserDAO userDAO;
     private final FileDAO fileDAO;
-    private User user = null;
 
     public Controller() throws RemoteException {
         super();
@@ -24,9 +24,11 @@ public class Controller extends UnicastRemoteObject implements Catalog {
     }
 
     @Override
-    public void registerUser(String username, String password) {
+    public void registerUser(String username, String password) throws RemoteException {
         if (userDAO.findUserByUsername(username) == null) {
             userDAO.storeUser(new User(username, password));
+        } else {
+            throw new RemoteException("The username '" + username + "' is already taken!");
         }
     }
 
@@ -39,25 +41,27 @@ public class Controller extends UnicastRemoteObject implements Catalog {
     }
 
     @Override
-    public void loginUser(String username, String password) {
+    public User loginUser(String username, String password) {
         User user = userDAO.findUserByUsername(username);
         if (user != null && BCrypt.checkpw(password, user.getPassword())) {
-            this.user = user;
+            return user;
         }
+        return null;
     }
 
     @Override
-    public void logoutUser() {
-        if (this.user != null) this.user = null;
+    public List<? extends FileDTO> findAllFiles() throws RemoteException {
+        return findAllFiles(null);
     }
 
     @Override
-    public List<? extends FileDTO> findAllFiles() {
-        return fileDAO.findAllFiles(this.user);
+    public List<? extends FileDTO> findAllFiles(UserDTO owner) {
+        User user = owner == null ? null : userDAO.findUserByUsername(owner.getUsername());
+        return fileDAO.findAllFiles(user);
     }
 
     @Override
-    public void storeFile(String name, boolean privateAccess) {
-        fileDAO.storeFile(new File(this.user, name, privateAccess));
+    public void storeFile(UserDTO owner, String name, boolean privateAccess) {
+        fileDAO.storeFile(new File(userDAO.findUserByUsername(owner.getUsername()), name, privateAccess));
     }
 }

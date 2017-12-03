@@ -3,6 +3,7 @@ package client.view;
 import common.Catalog;
 import common.FileDTO;
 import common.PrettyPrinter;
+import common.UserDTO;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -13,6 +14,7 @@ public class CatalogShell implements Runnable {
     private final ThreadSafeStdOut outMgr = new ThreadSafeStdOut();
     private final Scanner console = new Scanner(System.in);
     private Catalog catalog;
+    private UserDTO user = null;
     private boolean running = false;
 
     public void start(Catalog catalog) {
@@ -36,21 +38,32 @@ public class CatalogShell implements Runnable {
                 switch (parsedLine.getCommand()) {
                     case REGISTER:
                         catalog.registerUser(parsedLine.getArgument(0), parsedLine.getArgument(1));
+                        outMgr.println(PrettyPrinter.buildSimpleMessage("User '" + parsedLine.getArgument(0) + "' successfully registered!"));
                         break;
                     case UNREGISTER:
                         catalog.unregisterUser(parsedLine.getArgument(0), parsedLine.getArgument(1));
+                        this.user = null;
+                        outMgr.println(PrettyPrinter.buildSimpleMessage("User '" + parsedLine.getArgument(0) + "' successfully unregistered!"));
                         break;
                     case LOGIN:
-                        catalog.loginUser(parsedLine.getArgument(0), parsedLine.getArgument(1));
+                        this.user = catalog.loginUser(parsedLine.getArgument(0), parsedLine.getArgument(1));
+                        outMgr.println(PrettyPrinter.buildSimpleMessage("Logged in as '" + user.getUsername() + "'!"));
                         break;
                     case LOGOUT:
-                        catalog.logoutUser();
+                        this.user = null;
+                        outMgr.println(PrettyPrinter.buildSimpleMessage("Logout successful!"));
                         break;
                     case STORE_FILE:
-                        catalog.storeFile(parsedLine.getArgument(0), Boolean.parseBoolean(parsedLine.getArgument(1)));
+                        if (this.user != null) {
+                            catalog.storeFile(this.user, parsedLine.getArgument(0), Boolean.parseBoolean(parsedLine.getArgument(1)));
+                            outMgr.println(PrettyPrinter.buildSimpleMessage("File uploaded successfully!"));
+                        } else {
+                            outMgr.println(PrettyPrinter.buildSimpleMessage("You need to be logged in to upload a file!"));
+                        }
                         break;
                     case LIST_FILES:
-                        List<? extends FileDTO> list = catalog.findAllFiles();
+                        List<? extends FileDTO> list = user != null ? catalog.findAllFiles(user) : catalog.findAllFiles();
+                        outMgr.print(PrettyPrinter.buildSimpleMessage("The catalog contains the following files:"));
                         for (FileDTO file : list) {
                             outMgr.println(file.getName());
                         }
