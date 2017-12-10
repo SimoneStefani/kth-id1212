@@ -1,7 +1,9 @@
 package me.sstefani.netprog.webapp.controllers;
 
+import me.sstefani.netprog.webapp.integration.CurrencyRepository;
 import me.sstefani.netprog.webapp.models.Conversion;
 import me.sstefani.netprog.webapp.models.Currency;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +16,16 @@ import java.util.List;
 @Controller
 public class ConverterController {
 
+    private final CurrencyRepository currencyRepository;
+
+    @Autowired
+    public ConverterController(CurrencyRepository currencyRepository) {
+        this.currencyRepository = currencyRepository;
+    }
+
     @GetMapping(value = "/")
     public String converter(Model model) {
-        model.addAttribute("currencies", makeCurr());
+        model.addAttribute("currencies", currencyRepository.findAll());
         model.addAttribute("conversion", new Conversion());
         return "converter";
     }
@@ -26,12 +35,4 @@ public class ConverterController {
         System.out.println(conversion.toString());
     }
 
-    private List<Currency> makeCurr() {
-        List<Currency> currlist = new ArrayList<Currency>();
-        currlist.add(new Currency("Euro", "EUR"));
-        currlist.add(new Currency("US Dollar", "USD"));
-        currlist.add(new Currency("Swedish Crown", "SEK"));
-
-        return currlist;
-    }
 }
