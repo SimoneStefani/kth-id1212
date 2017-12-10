@@ -5,6 +5,21 @@
     <title>Title</title>
 </head>
 <body>
-<h1>Hello World</h1>
+<h1>Converter</h1>
+<form action="#" th:action="@{/convert}" th:object="${conversion}" method="post">
+    <p>From:</p>
+    <select th:field="*{fromCurrency}">
+        <option th:each="currency : ${currencies}" th:value="${currency.code}" th:text="${currency.code}"></option>
+    </select>
+
+    <p>Amount: <input type="number" th:field="*{amount}"/></p>
+
+    <p>To:</p>
+    <select th:field="*{toCurrency}">
+        <option th:each="currency : ${currencies}" th:value="${currency.code}" th:text="${currency.code}"></option>
+    </select>
+
+    <p><input type="submit" value="Submit"/></p>
+</form>
 </body>
 </html>
