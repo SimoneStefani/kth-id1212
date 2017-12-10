@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface RateRepository extends CrudRepository<Rate, Long> {
-    public Rate findByFromCurrencyAndToCurrency(@Param("fromCurrency") Currency fromCurrency, @Param("toCurrency") Currency toCurrency);
+    Rate findByFromCurrencyAndToCurrency(@Param("fromCurrency") Currency fromCurrency, @Param("toCurrency") Currency toCurrency);
 }
