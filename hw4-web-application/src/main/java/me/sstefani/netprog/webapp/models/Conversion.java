@@ -5,14 +5,16 @@ public class Conversion {
     private String fromCurrency;
     private String toCurrency;
     private double amount;
+    private double result;
 
-    @Override
-    public String toString() {
-        return "Conversion{" +
-                "fromCurrency='" + fromCurrency + '\'' +
-                ", toCurrency='" + toCurrency + '\'' +
-                ", amount=" + amount +
-                '}';
+    public Conversion() {
+    }
+
+    public Conversion(String fromCurrency, String toCurrency, double amount, double result) {
+        this.fromCurrency = fromCurrency;
+        this.toCurrency = toCurrency;
+        this.amount = amount;
+        this.result = result;
     }
 
     public String getFromCurrency() {
@@ -37,5 +39,13 @@ public class Conversion {
 
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    public double getResult() {
+        return result;
+    }
+
+    public void setResult(double result) {
+        this.result = result;
     }
 }

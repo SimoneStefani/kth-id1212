@@ -9,17 +9,23 @@
 <form action="#" th:action="@{/convert}" th:object="${conversion}" method="post">
     <p>From:</p>
     <select th:field="*{fromCurrency}">
-        <option th:each="currency : ${currencies}" th:value="${currency.code}" th:text="${currency.code}"></option>
+        <option th:each="currency : ${currencies}" th:value="${currency.code}" th:text="${currency.code}"
+                th:selected="${currency.code} == ${conversion.fromCurrency}"></option>
     </select>
 
-    <p>Amount: <input type="number" th:field="*{amount}"/></p>
+    <p>Amount: <input type="number" th:field="*{amount}" th:value="${conversion.amount}"/></p>
 
     <p>To:</p>
     <select th:field="*{toCurrency}">
-        <option th:each="currency : ${currencies}" th:value="${currency.code}" th:text="${currency.code}"></option>
+        <option th:each="currency : ${currencies}" th:value="${currency.code}" th:text="${currency.code}"
+                th:selected="${currency.code} == ${conversion.toCurrency}"></option>
     </select>
 
     <p><input type="submit" value="Submit"/></p>
+
+    <p>Result: <input type="number" th:value="${conversion.result}" readonly="readonly"/></p>
+
+    <a th:href="@{/reset}">Reset</a>
 </form>
 </body>
 </html>
