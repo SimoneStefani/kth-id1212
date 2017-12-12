@@ -8,8 +8,28 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    ListView listView;
+    List<String> checklists = new ArrayList<>();
+    ArrayAdapter adapter;
+
+    RequestQueue queue;
+    String url = "http://192.168.0.109:8080/api/checklists";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +46,19 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        queue = Volley.newRequestQueue(MainActivity.this);
+
+        listView = (ListView) findViewById(R.id.checklists);
+
+        for (int i = 1; i <= 10; i++) {
+            checklists.add("Checklist " + i);
+        }
+
+        adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, checklists);
+        listView.setAdapter(adapter);
+
+        fetchChecklists();
     }
 
     @Override
@@ -48,5 +81,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void fetchChecklists() {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+                        System.out.println(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("That didn't work!");
+            }
+        });
+
+        queue.add(stringRequest);
     }
 }
