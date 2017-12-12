@@ -1,7 +1,7 @@
 package me.sstefani.todoapi.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -10,26 +10,24 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(value = {"createdAt", "updatedAt"}, allowGetters = true)
-public class Task implements Serializable {
+public class Checklist implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @NotBlank
-    private String title;
+    private String name;
 
-    //@NotBlank
-    private boolean completed;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "checklist_id", nullable = false)
-    @JsonBackReference
-    private Checklist checklist;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "checklist")
+    @JsonManagedReference
+    private Set<Task> tasks = new HashSet<>();
 
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -41,40 +39,31 @@ public class Task implements Serializable {
     @LastModifiedDate
     private Date updatedAt;
 
-    public Task() {
+    public Checklist() {
     }
 
-    public Task(String title) {
-        this.title = title;
-        this.completed = false;
+    public Checklist(String name) {
+        this.name = name;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public boolean isCompleted() {
-        return completed;
+    public Set<Task> getTasks() {
+        return tasks;
     }
 
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
-    }
-
-    public Checklist getChecklist() {
-        return checklist;
-    }
-
-    public void setChecklist(Checklist checklist) {
-        this.checklist = checklist;
+    public void setTasks(Set<Task> tasks) {
+        this.tasks = tasks;
     }
 
     public Date getCreatedAt() {

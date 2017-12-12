@@ -35,7 +35,7 @@ public class TaskController {
     @PutMapping("/tasks/{id}")
     public ResponseEntity<Task> updateTask(@PathVariable(value = "id") Long taskId, @Valid @RequestBody Task data) {
         Task task = taskRepository.findOne(taskId);
-        if(task == null) return ResponseEntity.notFound().build();
+        if (task == null) return ResponseEntity.notFound().build();
 
         task.setTitle(data.getTitle());
         task.setCompleted(data.isCompleted());
@@ -46,7 +46,7 @@ public class TaskController {
     @DeleteMapping("/tasks/{id}")
     public ResponseEntity<Task> deleteTask(@PathVariable(value = "id") Long taskId) {
         Task task = taskRepository.findOne(taskId);
-        if(task == null) return ResponseEntity.notFound().build();
+        if (task == null) return ResponseEntity.notFound().build();
 
         taskRepository.delete(task);
         return ResponseEntity.ok().build();
