@@ -1,6 +1,5 @@
 package me.sstefani.todoapi.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.validator.constraints.NotBlank;
@@ -25,10 +24,8 @@ public class User {
 
     @NotBlank
     @NaturalId
-    private String email;
+    private String username;
 
-    @NotBlank
-    @JsonIgnore
     private String password;
 
     @Column(nullable = false, updatable = false)
@@ -44,9 +41,9 @@ public class User {
     public User() {
     }
 
-    public User(String name, String email, String password) {
+    public User(String name, String username, String password) {
         this.name = name;
-        this.email = email;
+        this.username = username;
         this.password = password;
     }
 
@@ -62,12 +59,12 @@ public class User {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
+    public String getUsername() {
+        return username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {

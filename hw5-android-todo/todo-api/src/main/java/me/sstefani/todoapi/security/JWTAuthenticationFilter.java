@@ -18,10 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static me.sstefani.todoapi.security.SecurityConstants.SECRET;
-import static me.sstefani.todoapi.security.SecurityConstants.EXPIRATION_TIME;
-import static me.sstefani.todoapi.security.SecurityConstants.HEADER_STRING;
-import static me.sstefani.todoapi.security.SecurityConstants.TOKEN_PREFIX;
+import static me.sstefani.todoapi.security.SecurityConstants.*;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -35,7 +32,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try {
             User credentials = new ObjectMapper().readValue(request.getInputStream(), User.class);
-            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(credentials.getEmail(), credentials.getPassword(), new ArrayList<>()));
+            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(credentials.getUsername(), credentials.getPassword(), new ArrayList<>()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -44,7 +41,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         String token = Jwts.builder()
-                .setSubject(((User) authResult.getPrincipal()).getEmail())
+                .setSubject(((org.springframework.security.core.userdetails.User) authResult.getPrincipal()).getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
