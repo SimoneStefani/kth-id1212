@@ -2,8 +2,10 @@ package me.sstefani.todoapi;
 
 import me.sstefani.todoapi.integration.ChecklistRepository;
 import me.sstefani.todoapi.integration.TaskRepository;
+import me.sstefani.todoapi.integration.UserRepository;
 import me.sstefani.todoapi.model.Checklist;
 import me.sstefani.todoapi.model.Task;
+import me.sstefani.todoapi.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -18,16 +20,19 @@ public class TodoApiApplication implements CommandLineRunner{
 
     private final ChecklistRepository checklistRepository;
     private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+
     @Autowired
-    public TodoApiApplication(ChecklistRepository checklistRepository, TaskRepository taskRepository) {
+    public TodoApiApplication(ChecklistRepository checklistRepository, TaskRepository taskRepository, UserRepository userRepository) {
         this.checklistRepository = checklistRepository;
         this.taskRepository = taskRepository;
+        this.userRepository = userRepository;
     }
 
     public static void main(String[] args) {
@@ -39,21 +44,34 @@ public class TodoApiApplication implements CommandLineRunner{
         // Cleanup Database tables
         checklistRepository.deleteAllInBatch();
         taskRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
 
         // ======================================
 
-        Checklist checklist = new Checklist("University todo list");
+        User user = new User("Alan Turing", "turing@enigma.org", "secret");
+        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+
+        Checklist checklist1 = new Checklist("University todo list");
+        Checklist checklist2 = new Checklist("Work todo list");
+        Checklist checklist3 = new Checklist("Music todo list");
 
         Task task1 = new Task("First task");
-        task1.setChecklist(checklist);
+        task1.setChecklist(checklist1);
 
         Task task2 = new Task("Second task");
-        task2.setChecklist(checklist);
+        task2.setChecklist(checklist1);
 
-        checklist.getTasks().add(task1);
-        checklist.getTasks().add(task2);
+        checklist1.getTasks().add(task1);
+        checklist1.getTasks().add(task2);
+        checklist1.getUsers().add(user);
 
-        checklistRepository.save(checklist);
+        checklist3.getUsers().add(user);
+
+        user.getChecklists().add(checklist1);
+        user.getChecklists().add(checklist3);
+
+        userRepository.save(user);
+        checklistRepository.save(checklist2);
 
         // ======================================
     }

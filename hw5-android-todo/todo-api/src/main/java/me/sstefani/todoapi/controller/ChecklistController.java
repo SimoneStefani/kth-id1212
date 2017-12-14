@@ -1,12 +1,14 @@
 package me.sstefani.todoapi.controller;
 
 import me.sstefani.todoapi.integration.ChecklistRepository;
+import me.sstefani.todoapi.integration.UserRepository;
 import me.sstefani.todoapi.model.Checklist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -16,9 +18,12 @@ public class ChecklistController {
     @Autowired
     ChecklistRepository checklistRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
     @GetMapping("/checklists")
-    public List<Checklist> getAllChecklists() {
-        return checklistRepository.findAll();
+    public List<Checklist> getAllChecklists(Principal principal) {
+        return checklistRepository.findAllByUsers(userRepository.findByUsername(principal.getName()));
     }
 
     @PostMapping("/checklists")
