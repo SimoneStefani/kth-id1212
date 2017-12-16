@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter adapter;
 
     private String newChecklistName = "";
+    private String importByCode = "";
 
 
     @Override
@@ -131,6 +132,35 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
+        if (id == R.id.action_import) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("Import Todo List");
+
+            builder.setMessage("Insert shared code:");
+            // Set up the input
+            final EditText input = new EditText(MainActivity.this);
+            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(input);
+
+            // Set up the buttons
+            builder.setPositiveButton("import", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    importByCode = input.getText().toString();
+                    importChecklist(importByCode);
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -199,6 +229,25 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Checklist checklist) {
 
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("That didn't work! " + error.getStackTrace());
+            }
+        });
+
+        VolleyController.getInstance(this).addToRequestQueue(jsonRequest);
+    }
+
+    private void importChecklist(String code) {
+        GsonRequest<Checklist> jsonRequest = new GsonRequest(
+                Request.Method.PUT, "/api/users/checklists/" + code, Checklist.class,
+                new Response.Listener<Checklist>() {
+                    @Override
+                    public void onResponse(Checklist checklist) {
+                        lists.add(checklist);
+                        adapter.notifyDataSetChanged();
                     }
                 }, new Response.ErrorListener() {
             @Override

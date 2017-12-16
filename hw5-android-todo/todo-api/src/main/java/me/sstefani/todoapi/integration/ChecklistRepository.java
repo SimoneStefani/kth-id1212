@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface ChecklistRepository extends JpaRepository<Checklist, Long> {
     List<Checklist> findAllByUsers(User user);
+    Checklist findByCode(String code);
 }
