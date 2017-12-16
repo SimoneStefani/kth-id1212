@@ -8,11 +8,6 @@ public class Task implements Serializable {
     private Long id;
     private String title;
     private boolean completed;
-    private Checklist checklist;
-    private Date createdAt;
-    private Date updatedAt;
-    public Task() {
-    }
 
     public Task(String title) {
         this.title = title;
@@ -21,6 +16,10 @@ public class Task implements Serializable {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -37,22 +36,6 @@ public class Task implements Serializable {
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
-    }
-
-    public Checklist getChecklist() {
-        return checklist;
-    }
-
-    public void setChecklist(Checklist checklist) {
-        this.checklist = checklist;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
     }
 }
 

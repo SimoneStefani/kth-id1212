@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int pos, long id) {
-                taskLongSelected(pos);
+                listLongSelected(pos);
                 return true;
             }
         });
@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
         VolleyController.getInstance(this).addToRequestQueue(jsonRequest);
     }
 
-    private void taskLongSelected(final int position) {
+    private void listLongSelected(final int position) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
         alertDialogBuilder.setTitle("Delete Todo List");
 
