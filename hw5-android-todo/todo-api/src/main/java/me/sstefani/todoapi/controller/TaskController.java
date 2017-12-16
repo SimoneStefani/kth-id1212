@@ -43,8 +43,8 @@ public class TaskController {
         return task == null ? ResponseEntity.notFound().build() : ResponseEntity.ok().body(task);
     }
 
-    @PutMapping("/tasks/{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable(value = "id") Long taskId, @Valid @RequestBody Task data) {
+    @PutMapping("/checklists/{checklistId}/tasks/{taskId}")
+    public ResponseEntity<Task> updateTask(@PathVariable(value = "checklistId") Long checklistId, @PathVariable(value = "taskId") Long taskId, @Valid @RequestBody Task data) {
         Task task = taskRepository.findOne(taskId);
         if (task == null) return ResponseEntity.notFound().build();
 

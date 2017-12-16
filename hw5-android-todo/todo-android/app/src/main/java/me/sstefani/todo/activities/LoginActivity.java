@@ -1,11 +1,9 @@
-package me.sstefani.todo;
+package me.sstefani.todo.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -20,12 +18,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
-import java.lang.reflect.Method;
-
+import me.sstefani.todo.utilities.DataHolder;
+import me.sstefani.todo.utilities.GsonRequest;
+import me.sstefani.todo.R;
+import me.sstefani.todo.utilities.VolleyController;
 import me.sstefani.todo.model.Credentials;
 import me.sstefani.todo.model.JWTWrapper;
 

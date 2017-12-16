@@ -1,4 +1,4 @@
-package me.sstefani.todo;
+package me.sstefani.todo.utilities;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;

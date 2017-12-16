@@ -40,7 +40,8 @@ public class Task implements Serializable {
 
     @Override
     public String toString() {
-        return this.title;
+        String status = isCompleted() ? "COMPLETED" : "NOT COMPLETED";
+        return this.title + " - " + status;
     }
 }
 

@@ -1,4 +1,4 @@
-package me.sstefani.todo;
+package me.sstefani.todo.utilities;
 
 
 import me.sstefani.todo.model.User;

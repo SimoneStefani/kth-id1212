@@ -1,10 +1,9 @@
-package me.sstefani.todo;
+package me.sstefani.todo.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -25,6 +23,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import me.sstefani.todo.utilities.DataHolder;
+import me.sstefani.todo.utilities.GsonRequest;
+import me.sstefani.todo.R;
+import me.sstefani.todo.utilities.VolleyController;
 import me.sstefani.todo.model.Checklist;
 import me.sstefani.todo.model.Task;
 
@@ -60,6 +62,13 @@ public class ChecklistActivity extends AppCompatActivity {
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int pos, long id) {
                 taskLongSelected(pos, checklist.getId());
                 return true;
+            }
+        });
+
+        checklistView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
+                toggleStatus(pos, checklist.getId());
             }
         });
 
@@ -197,6 +206,28 @@ public class ChecklistActivity extends AppCompatActivity {
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
+    }
+
+    private void toggleStatus(final int pos, Long checklistId) {
+        Task task = tasks.get(pos);
+        task.setCompleted(!task.isCompleted());
+
+        GsonRequest<Task> jsonRequest = new GsonRequest(
+                Request.Method.PUT, "/api/checklists/" + checklistId + "/tasks/" + task.getId(), task, Task.class,
+                new Response.Listener<Task>() {
+                    @Override
+                    public void onResponse(Task task) {
+                        tasks.set(pos, task);
+                        adapter.notifyDataSetChanged();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("That didn't work! " + error.getStackTrace());
+            }
+        });
+
+        VolleyController.getInstance(this).addToRequestQueue(jsonRequest);
     }
 
 }

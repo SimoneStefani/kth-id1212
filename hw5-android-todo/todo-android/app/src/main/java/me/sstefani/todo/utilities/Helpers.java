@@ -1,4 +1,4 @@
-package me.sstefani.todo;
+package me.sstefani.todo.utilities;
 
 import android.app.Activity;
 import android.content.Context;

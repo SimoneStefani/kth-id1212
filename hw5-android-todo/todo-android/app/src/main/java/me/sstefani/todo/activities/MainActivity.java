@@ -1,4 +1,4 @@
-package me.sstefani.todo;
+package me.sstefani.todo.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,6 +24,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import me.sstefani.todo.utilities.DataHolder;
+import me.sstefani.todo.utilities.GsonRequest;
+import me.sstefani.todo.R;
+import me.sstefani.todo.utilities.VolleyController;
 import me.sstefani.todo.model.Checklist;
 import me.sstefani.todo.model.User;
 

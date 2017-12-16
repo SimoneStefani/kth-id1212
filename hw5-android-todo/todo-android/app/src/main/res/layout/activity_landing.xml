@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="me.sstefani.todo.LandingActivity">
+    tools:context="me.sstefani.todo.activities.LandingActivity">
 
     <ImageView
         android:id="@+id/imageView"
@@ -29,6 +29,7 @@
         android:layout_marginTop="89dp"
         android:backgroundTint="@android:color/holo_red_light"
         android:text="@string/login_redirect_btn"
+        android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
