@@ -37,5 +37,10 @@ public class Task implements Serializable {
     public void setCompleted(boolean completed) {
         this.completed = completed;
     }
+
+    @Override
+    public String toString() {
+        return this.title;
+    }
 }
 

@@ -1,6 +1,7 @@
 package me.sstefani.todo;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -20,6 +22,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import me.sstefani.todo.model.Checklist;
@@ -42,8 +45,14 @@ public class ChecklistActivity extends AppCompatActivity {
 
         final Checklist checklist = (Checklist) getIntent().getSerializableExtra("CHECKLIST");
 
-        TextView title = findViewById(R.id.checklist_title);
-        title.setText(checklist.getName());
+        getSupportActionBar().setTitle(checklist.getName());
+
+        fetchTasks(checklist.getId());
+
+        checklistView = findViewById(R.id.checklist);
+
+        adapter = new ArrayAdapter(ChecklistActivity.this, android.R.layout.simple_list_item_1, tasks);
+        checklistView.setAdapter(adapter);
 
         checklistView.setLongClickable(true);
         checklistView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -85,6 +94,45 @@ public class ChecklistActivity extends AppCompatActivity {
                 builder.show();
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_logout) {
+            DataHolder.getInstance().setCurrentUser(null);
+            DataHolder.getInstance().setJwt(null);
+
+            Intent intent = new Intent(ChecklistActivity.this, LandingActivity.class);
+            startActivity(intent);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void fetchTasks(long checklistId) {
+        GsonRequest<Task[]> jsonRequest = new GsonRequest(
+                Request.Method.GET, "/api/checklists/" + checklistId + "/tasks", Task[].class,
+                new Response.Listener<Task[]>() {
+                    @Override
+                    public void onResponse(Task[] todos) {
+                        Collections.addAll(tasks, todos);
+                        adapter.notifyDataSetChanged();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("That didn't work! " + error.getStackTrace());
+            }
+        });
+
+        VolleyController.getInstance(this).addToRequestQueue(jsonRequest);
     }
 
     private void createTask(String title, Long checklistId) {

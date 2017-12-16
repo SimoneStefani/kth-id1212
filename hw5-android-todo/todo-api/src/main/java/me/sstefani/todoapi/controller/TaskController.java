@@ -23,9 +23,10 @@ public class TaskController {
     @Autowired
     ChecklistRepository checklistRepository;
 
-    @GetMapping("/tasks")
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+    @GetMapping("/checklists/{checklistId}/tasks")
+    public List<Task> getAllTasks(@PathVariable(value = "checklistId") Long checklistId) {
+        Checklist checklist = checklistRepository.findOne(checklistId);
+        return taskRepository.findAllByChecklist(checklist);
     }
 
     @PostMapping("/checklists/{checklistId}/tasks")
@@ -59,7 +60,6 @@ public class TaskController {
         Task task = taskRepository.findOne(taskId);
         if (task == null) return ResponseEntity.notFound().build();
 
-        task.setChecklist(null);
         checklist.getTasks().remove(task);
 
         checklistRepository.save(checklist);
