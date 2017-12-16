@@ -1,14 +1,18 @@
 package me.sstefani.todo;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.android.volley.Request;
@@ -21,12 +25,16 @@ import java.util.Collections;
 import java.util.List;
 
 import me.sstefani.todo.model.Checklist;
+import me.sstefani.todo.model.User;
 
 public class MainActivity extends AppCompatActivity {
 
     ListView listView;
     List<Checklist> lists = new ArrayList<>();
     ArrayAdapter adapter;
+
+    private String newChecklistName = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +47,35 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Create New Todo List");
+
+                // Set up the input
+                final EditText input = new EditText(MainActivity.this);
+                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+
+                // Set up the buttons
+                builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        newChecklistName = input.getText().toString();
+                        createChecklist(newChecklistName);
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
             }
         });
 
+        fetchUser();
         fetchChecklists();
 
         listView = findViewById(R.id.checklists);
@@ -76,13 +108,51 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchChecklists() {
-        System.out.println(DataHolder.getInstance().getJwt());
         GsonRequest<Checklist[]> jsonRequest = new GsonRequest(
                 Request.Method.GET, "/api/checklists", Checklist[].class,
                 new Response.Listener<Checklist[]>() {
                     @Override
                     public void onResponse(Checklist[] checklists) {
                         Collections.addAll(lists, checklists);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("That didn't work! " + error.getStackTrace());
+            }
+        });
+
+        VolleyController.getInstance(this).addToRequestQueue(jsonRequest);
+    }
+
+    private void fetchUser() {
+        GsonRequest<User> jsonRequest = new GsonRequest(
+                Request.Method.GET, "/api/user", User.class,
+                new Response.Listener<User>() {
+                    @Override
+                    public void onResponse(User user) {
+                        DataHolder.getInstance().setCurrentUser(user);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("That didn't work! " + error.getStackTrace());
+            }
+        });
+
+        VolleyController.getInstance(this).addToRequestQueue(jsonRequest);
+    }
+
+    private void createChecklist(String title) {
+        Checklist checklist = new Checklist(title);
+        Long usrId = DataHolder.getHolder().getCurrentUser().getId();
+        GsonRequest<Checklist> jsonRequest = new GsonRequest(
+                Request.Method.POST, "/api/checklists/user/" + usrId, checklist, Checklist.class,
+                new Response.Listener<Checklist>() {
+                    @Override
+                    public void onResponse(Checklist checklist) {
+                        lists.add(checklist);
+                        adapter.notifyDataSetChanged();
                     }
                 }, new Response.ErrorListener() {
             @Override
