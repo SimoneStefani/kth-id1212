@@ -3,7 +3,6 @@ package me.sstefani.todo;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -11,12 +10,12 @@ import android.text.InputType;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
@@ -83,6 +82,22 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, lists);
         listView.setAdapter(adapter);
 
+        listView.setLongClickable(true);
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int pos, long id) {
+                taskLongSelected(pos);
+                return true;
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
+
+            }
+        });
+
     }
 
     @Override
@@ -114,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Checklist[] checklists) {
                         Collections.addAll(lists, checklists);
+                        adapter.notifyDataSetChanged();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -162,5 +178,48 @@ public class MainActivity extends AppCompatActivity {
         });
 
         VolleyController.getInstance(this).addToRequestQueue(jsonRequest);
+    }
+
+    private void deleteChecklist(Long id) {
+        GsonRequest<Checklist> jsonRequest = new GsonRequest(
+                Request.Method.DELETE, "/api/checklists/" + id, Checklist.class,
+                new Response.Listener<Checklist>() {
+                    @Override
+                    public void onResponse(Checklist checklist) {
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("That didn't work! " + error.getStackTrace());
+            }
+        });
+
+        VolleyController.getInstance(this).addToRequestQueue(jsonRequest);
+    }
+
+    private void taskLongSelected(final int position) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setTitle("Delete Todo List");
+
+        final Checklist checklist = lists.get(position);
+
+        alertDialogBuilder
+                .setMessage("Do you really want to delete '" + checklist.getName() + "'?")
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        deleteChecklist(checklist.getId());
+                        lists.remove(checklist);
+                        adapter.notifyDataSetChanged();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 }

@@ -52,11 +52,17 @@ public class ChecklistController {
     }
 
     @DeleteMapping("/checklists/{id}")
-    public ResponseEntity<Checklist> deleteChecklist(@PathVariable(value = "id") Long checklistId) {
+    public ResponseEntity<Checklist> deleteChecklist(@PathVariable(value = "id") Long checklistId, Principal principal) {
         Checklist checklist = checklistRepository.findOne(checklistId);
+        User user = userRepository.findByUsername(principal.getName());
         if (checklist == null) return ResponseEntity.notFound().build();
 
+        checklist.getUsers().remove(user);
+        user.getChecklists().remove(checklist);
+
+        userRepository.save(user);
         checklistRepository.delete(checklist);
+
         return ResponseEntity.ok().build();
     }
 }
