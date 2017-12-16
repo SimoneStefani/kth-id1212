@@ -1,6 +1,7 @@
 package me.sstefani.todoapi.model;
 
 import com.fasterxml.jackson.annotation.*;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -23,6 +24,9 @@ public class Checklist implements Serializable {
 
     @NotBlank
     private String name;
+
+    @NotBlank
+    private String code;
 
     //@JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "checklist")
@@ -48,6 +52,7 @@ public class Checklist implements Serializable {
 
     public Checklist(String name) {
         this.name = name;
+        this.code = RandomStringUtils.randomAlphanumeric(6).toUpperCase();
     }
 
     public Long getId() {
@@ -60,6 +65,10 @@ public class Checklist implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCode() {
+        return code;
     }
 
     public Set<Task> getTasks() {

@@ -8,6 +8,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -35,6 +36,7 @@ public class ChecklistActivity extends AppCompatActivity {
     ListView checklistView;
     List<Task> tasks = new ArrayList<>();
     ArrayAdapter adapter;
+    Checklist currentChecklist;
 
     private String newTaskName = "";
 
@@ -42,10 +44,11 @@ public class ChecklistActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_checklist);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar_cl);
         setSupportActionBar(toolbar);
 
         final Checklist checklist = (Checklist) getIntent().getSerializableExtra("CHECKLIST");
+        this.currentChecklist = checklist;
 
         getSupportActionBar().setTitle(checklist.getName());
 
@@ -106,6 +109,13 @@ public class ChecklistActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_checklist, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -120,6 +130,22 @@ public class ChecklistActivity extends AppCompatActivity {
             Intent intent = new Intent(ChecklistActivity.this, LandingActivity.class);
             startActivity(intent);
             return true;
+        }
+
+        if (id == R.id.action_share) {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ChecklistActivity.this);
+            alertDialogBuilder.setTitle("Share Todo List");
+
+            alertDialogBuilder
+                    .setMessage("Todo List Code: " + currentChecklist.getCode())
+                    .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
         }
 
         return super.onOptionsItemSelected(item);

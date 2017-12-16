@@ -34,7 +34,7 @@
         <activity
             android:name=".activities.ChecklistActivity"
             android:label="@string/title_activity_checklist"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

@@ -8,6 +8,7 @@ public class Checklist implements Serializable {
 
     private Long id;
     private String name;
+    private String code;
 
     public Checklist(String name) {
         this.name = name;
@@ -32,6 +33,14 @@ public class Checklist implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     @Override

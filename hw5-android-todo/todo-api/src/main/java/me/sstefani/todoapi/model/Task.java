@@ -2,7 +2,6 @@ package me.sstefani.todoapi.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -23,9 +22,6 @@ public class Task implements Serializable {
 
     @NotBlank
     private String title;
-
-    @NotBlank
-    private String code;
 
     //@NotBlank
     private boolean completed;
@@ -51,7 +47,6 @@ public class Task implements Serializable {
     public Task(String title) {
         this.title = title;
         this.completed = false;
-        this.code = RandomStringUtils.randomAlphanumeric(6).toUpperCase();
     }
 
     public Long getId() {
@@ -64,10 +59,6 @@ public class Task implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getCode() {
-        return code;
     }
 
     public boolean isCompleted() {
