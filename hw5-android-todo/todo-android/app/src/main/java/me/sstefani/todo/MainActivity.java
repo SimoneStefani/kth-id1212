@@ -1,6 +1,7 @@
 package me.sstefani.todo;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -94,7 +95,9 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
-
+                Intent intent = new Intent(MainActivity.this, ChecklistActivity.class);
+                intent.putExtra("CHECKLIST", lists.get(pos));
+                startActivity(intent);
             }
         });
 

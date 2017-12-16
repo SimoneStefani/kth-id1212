@@ -1,5 +1,7 @@
 package me.sstefani.todo.model;
 
+import android.os.Parcelable;
+
 import java.io.Serializable;
 
 public class Checklist implements Serializable {

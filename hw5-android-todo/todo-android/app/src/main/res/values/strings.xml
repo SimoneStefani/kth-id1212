@@ -17,4 +17,5 @@
     </string>
     <string name="landing_icon">Landing Icon</string>
     <string name="login_redirect_btn">Login</string>
+    <string name="title_activity_checklist">ChecklistActivity</string>
 </resources>
