@@ -15,30 +15,27 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import me.sstefani.todo.model.Checklist;
 
 public class MainActivity extends AppCompatActivity {
 
     ListView listView;
-    List<String> checklists = new ArrayList<>();
+    List<Checklist> lists = new ArrayList<>();
     ArrayAdapter adapter;
-
-    RequestQueue queue;
-    String url = "http://192.168.0.109:8080/api/checklists";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -47,18 +44,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        queue = Volley.newRequestQueue(MainActivity.this);
+        fetchChecklists();
 
-        listView = (ListView) findViewById(R.id.checklists);
+        listView = findViewById(R.id.checklists);
 
-        for (int i = 1; i <= 10; i++) {
-            checklists.add("Checklist " + i);
-        }
-
-        adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, checklists);
+        adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, lists);
         listView.setAdapter(adapter);
 
-        fetchChecklists();
     }
 
     @Override
@@ -84,20 +76,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchChecklists() {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
+        System.out.println(DataHolder.getInstance().getJwt());
+        GsonRequest<Checklist[]> jsonRequest = new GsonRequest(
+                Request.Method.GET, "/api/checklists", Checklist[].class,
+                new Response.Listener<Checklist[]>() {
                     @Override
-                    public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
-                        System.out.println(response);
+                    public void onResponse(Checklist[] checklists) {
+                        Collections.addAll(lists, checklists);
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                System.out.println("That didn't work!");
+                System.out.println("That didn't work! " + error.getStackTrace());
             }
         });
 
-        queue.add(stringRequest);
+        VolleyController.getInstance(this).addToRequestQueue(jsonRequest);
     }
 }

@@ -24,8 +24,9 @@ public class Checklist implements Serializable {
     @NotBlank
     private String name;
 
+    //@JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "checklist")
-    @JsonManagedReference
+    @JsonIgnore
     private Set<Task> tasks = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "checklists")

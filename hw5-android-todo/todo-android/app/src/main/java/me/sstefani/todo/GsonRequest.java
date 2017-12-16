@@ -17,16 +17,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GsonRequest<T> extends Request<T> {
+    private static final String BASE_URL = "http://192.168.0.109:8080";
     private final Gson gson = new Gson();
     private final Class<T> clazz;
     private final Object body;
     private final Map<String, String> headers;
     private final Response.Listener<T> listener;
 
+
     public GsonRequest(int method, String url, Class<T> clazz, Response.Listener<T> listener, Response.ErrorListener errorListener) {
-        super(method, url, errorListener);
+        super(method, BASE_URL + url, errorListener);
         Map<String, String> headers = new HashMap<>();
         this.setStandardHeaders(headers);
+        this.attachJWT(headers, DataHolder.getInstance().getJwt());
         this.clazz = clazz;
         this.body = null;
         this.headers = headers;
@@ -34,9 +37,10 @@ public class GsonRequest<T> extends Request<T> {
     }
 
     public GsonRequest(int method, String url, Object body, Class<T> clazz, Response.Listener<T> listener, Response.ErrorListener errorListener) {
-        super(method, url, errorListener);
+        super(method, BASE_URL + url, errorListener);
         Map<String, String> headers = new HashMap<>();
         this.setStandardHeaders(headers);
+        this.attachJWT(headers, DataHolder.getInstance().getJwt());
         this.clazz = clazz;
         this.body = body;
         this.headers = headers;
@@ -73,6 +77,10 @@ public class GsonRequest<T> extends Request<T> {
         } catch (UnsupportedEncodingException | JsonSyntaxException | JSONException e) {
             return Response.error(new ParseError(e));
         }
+    }
+
+    private void attachJWT(Map<String, String> headers, String jwt) {
+        headers.put("Authorization", jwt);
     }
 
     private void setStandardHeaders(Map<String, String> headers) {

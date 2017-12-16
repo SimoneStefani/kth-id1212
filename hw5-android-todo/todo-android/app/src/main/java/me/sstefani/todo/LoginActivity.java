@@ -36,17 +36,13 @@ public class LoginActivity extends AppCompatActivity {
     private View mProgressView;
     private View mLoginFormView;
 
-    RequestQueue queue;
-    String url = "http://192.168.0.109:8080/login";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.login_email);
+        mEmailView = findViewById(R.id.login_email);
 
-        mPasswordView = (EditText) findViewById(R.id.login_password);
+        mPasswordView = findViewById(R.id.login_password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -58,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -84,6 +80,10 @@ public class LoginActivity extends AppCompatActivity {
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
+
+        //TODO: Only for testing
+        email = "turing@enigma.org";
+        password = "secret";
 
         boolean cancel = false;
         View focusView = null;
@@ -168,11 +168,11 @@ public class LoginActivity extends AppCompatActivity {
         Credentials credentials = new Credentials(username, password);
 
         GsonRequest<JWTWrapper> jsonRequest = new GsonRequest(
-                Request.Method.POST, url, credentials, JWTWrapper.class,
+                Request.Method.POST, "/login", credentials, JWTWrapper.class,
                 new Response.Listener<JWTWrapper>() {
                     @Override
                     public void onResponse(JWTWrapper jwtWrapper) {
-                        Helpers.saveJWT(LoginActivity.this, jwtWrapper.getJwt());
+                        DataHolder.getInstance().setJwt(jwtWrapper.getJwt());
 
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
