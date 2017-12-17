@@ -2,7 +2,7 @@
 # Network Programming (ID1212)
 The aim of the course is to introduce advanced tools and technologies for network programming including distributed applications, multithreading, web sockets and other network API:s.
 
-_This repository contains code written during the fall semester 2017 by Simone Stefani_
+_This repository contains code written during the fall semester 2017 by Marcel Eschmann and Simone Stefani_
 
 __Laboratories__
 - [X] Homework 1 - **Sockets**
