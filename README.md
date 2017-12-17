@@ -7,6 +7,6 @@ _This repository contains code written during the fall semester 2017 by Simone S
 __Laboratories__
 - [X] Homework 1 - **Sockets**
 - [X] Homework 2 - **Non-Blocking Sockets**
-- [ ] Homework 3 - **Remote Method Invocation and Database Access**
-- [ ] Homework 4 - **Web-Based Applications And Application Servers**
-- [ ] Homework 5 - **Distributed Applications Using Android**
+- [X] Homework 3 - **Remote Method Invocation and Database Access**
+- [X] Homework 4 - **Web-Based Applications And Application Servers**
+- [X] Homework 5 - **Distributed Applications Using Android**
